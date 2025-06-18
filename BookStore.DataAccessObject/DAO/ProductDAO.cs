@@ -10,8 +10,8 @@ namespace BookStore.DataAccessObject.DAO
 {
     public class ProductDAO
     {
-        private readonly BookStoreDbOptimizedContext _context;
-        public ProductDAO(BookStoreDbOptimizedContext context) {  _context = context; }
+        private readonly BookStoreDbContext _context;
+        public ProductDAO(BookStoreDbContext context) {  _context = context; }
         public async Task<IEnumerable<Product>> GetAllProductsAsync()
         {
             return await _context.Products.Include(p => p.Category).ToListAsync();

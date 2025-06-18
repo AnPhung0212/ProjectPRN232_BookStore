@@ -10,9 +10,9 @@ namespace BookStore.DataAccessObject.DAO
 {
     public class CategoryDAO
     {
-        private readonly BookStoreDbOptimizedContext _context;
+        private readonly BookStoreDbContext _context;
 
-        public CategoryDAO(BookStoreDbOptimizedContext context)
+        public CategoryDAO(BookStoreDbContext context)
         {
             _context = context;
         }

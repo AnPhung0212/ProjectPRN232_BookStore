@@ -9,13 +9,9 @@ public partial class Cart
 
     public int? UserId { get; set; }
 
-    public int? ProductId { get; set; }
+    public DateTime? CreatedDate { get; set; }
 
-    public int Quantity { get; set; }
-
-    public DateTime? AddedDate { get; set; }
-
-    public virtual Product? Product { get; set; }
+    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual User? User { get; set; }
 }
