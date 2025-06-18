@@ -10,9 +10,4 @@
     <ProjectReference Include="..\BookStore.DataAccessObject\BookStore.DataAccessObject.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Implement\" />
-  </ItemGroup>
-
 </Project>

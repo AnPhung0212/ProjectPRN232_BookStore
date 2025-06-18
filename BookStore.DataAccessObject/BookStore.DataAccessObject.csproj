@@ -10,10 +10,4 @@
     <ProjectReference Include="..\BookStore.BusinessObject\BookStore.BusinessObject.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DAO\" />
-    <Folder Include="IRepository\" />
-    <Folder Include="Repository\" />
-  </ItemGroup>
-
 </Project>
