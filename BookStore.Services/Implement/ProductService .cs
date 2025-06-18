@@ -36,10 +36,36 @@ namespace BookStore.Services.Implement
             await _productRepo.AddProductAsync(product);
         }
 
-        public async Task UpdateProductAsync(ProductDTO productDto)
+        public async Task UpdateProductAsync(UpdateProductDTO dto)
         {
-            var product = MapToEntity(productDto);
-            await _productRepo.UpdateProductAsync(product);
+            var existingProduct = await _productRepo.GetProductByIdAsync(dto.ProductId);
+            if (existingProduct == null)
+            {
+                throw new Exception("Product not found");
+            }
+            // Cập nhật có điều kiện (nếu khác null thì mới cập nhật)
+            if (dto.CategoryId.HasValue)
+                existingProduct.CategoryId = dto.CategoryId.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.Title))
+                existingProduct.Title = dto.Title;
+
+            if (!string.IsNullOrWhiteSpace(dto.Author))
+                existingProduct.Author = dto.Author;
+
+            if (dto.Price.HasValue)
+                existingProduct.Price = dto.Price.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.Description))
+                existingProduct.Description = dto.Description;
+
+            if (dto.Stock.HasValue)
+                existingProduct.Stock = dto.Stock.Value;
+
+            if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
+                existingProduct.ImageUrl = dto.ImageUrl;
+            await _productRepo.UpdateProductAsync(existingProduct);
+
         }
 
         public async Task DeleteProductAsync(int id)
