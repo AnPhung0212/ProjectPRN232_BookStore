@@ -24,8 +24,8 @@ namespace BookStore.DataAccessObject.Repository
         public async Task<User?> GetByIdAsync(int id) =>
             await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == id);
 
-        public async Task<User?> GetByUsernamePasswordAsync(string email, string password) =>
-            await _context.Users.FirstOrDefaultAsync(u => u.Username == email && u.Password == password);
+        public async Task<User?> GetByEmailPasswordAsync(string email, string password) =>
+            await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
 
         public async Task<IEnumerable<User>> GetUsersByRoleIdAsync(int roleId) =>
             await _context.Users.Where(u => u.RoleId == roleId).ToListAsync();

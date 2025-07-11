@@ -32,7 +32,7 @@ namespace BookStore.Services.Implement
 
         public async Task<UserDto?> AuthenticateAsync(UserLoginDto loginDto)
         {
-            var user = await _repo.GetByUsernamePasswordAsync(loginDto.Username, loginDto.Password);
+            var user = await _repo.GetByEmailPasswordAsync(loginDto.Email, loginDto.Password);
             return user != null ? ToDto(user) : null;
         }
 

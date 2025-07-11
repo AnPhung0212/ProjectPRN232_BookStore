@@ -12,7 +12,7 @@ namespace BookStore.DataAccessObject.IRepository
         Task<IEnumerable<User>> GetAllAsync();
         Task<User?> GetByIdAsync(int id);
         //login
-        Task<User?> GetByUsernamePasswordAsync(string username, string password);
+        Task<User?> GetByEmailPasswordAsync(string email, string password);
         Task<IEnumerable<User>> GetUsersByRoleIdAsync(int roleId);
         //register
         Task AddAsync(User user);
