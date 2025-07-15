@@ -24,11 +24,31 @@ namespace BookStore.Services.Implement
             return products.Select(p => MapToDTO(p));
         }
 
+        /*        public async Task<ProductDTO?> GetProductByIdAsync(int id)
+                {
+                    var product = await _productRepo.GetProductByIdAsync(id);
+                    return product == null ? null : MapToDTO(product);
+                }*/
         public async Task<ProductDTO?> GetProductByIdAsync(int id)
         {
             var product = await _productRepo.GetProductByIdAsync(id);
-            return product == null ? null : MapToDTO(product);
+
+            if (product == null) return null;
+
+            return new ProductDTO
+            {
+                ProductId = product.ProductId,
+                CategoryId = product.CategoryId,
+                Title = product.Title,
+                Author = product.Author,
+                Price = product.Price,
+                Description = product.Description,
+                Stock = product.Stock,
+                ImageUrl = product.ImageUrl,
+                CategoryName = product.Category?.CategoryName  // ✅ thêm dòng này
+            };
         }
+
 
         public async Task AddProductAsync(ProductDTO productDto)
         {
@@ -76,6 +96,11 @@ namespace BookStore.Services.Implement
         public async Task<IEnumerable<ProductDTO>> SearchProductsAsync(string searchTerm)
         {
             var products = await _productRepo.SearchProductsAsync(searchTerm);
+            return products.Select(p => MapToDTO(p));
+        }
+        public async Task<IEnumerable<ProductDTO>> GetProductsByCategoryAsync(int categoryId)
+        {
+            var products = await _productRepo.GetProductByCategoryIdAsync(categoryId);
             return products.Select(p => MapToDTO(p));
         }
 

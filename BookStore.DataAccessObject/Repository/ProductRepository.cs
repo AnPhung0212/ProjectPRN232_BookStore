@@ -1,6 +1,7 @@
 ﻿using BookStore.BusinessObject.Models;
 using BookStore.DataAccessObject.DAO;
 using BookStore.DataAccessObject.IRepository;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,5 +46,10 @@ namespace BookStore.DataAccessObject.Repository
         {
             return _productDAO.UpdateProductAsync(product);
         }
+        public async Task<IEnumerable<Product>> GetProductByCategoryIdAsync(int categoryId)
+        {
+            return await _productDAO.GetProductByCategoryIdAsync(categoryId);
+        }
+
     }
 }

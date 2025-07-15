@@ -24,7 +24,12 @@ namespace BookStore.API.Controllers
             var products = await _productService.GetAllProductsAsync();
             return Ok(products);
         }
-
+        [HttpGet("category/{categoryId}")]
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetByCategory(int categoryId)
+        {
+            var products = await _productService.GetProductsByCategoryAsync(categoryId);
+            return Ok(products);
+        }
         // GET: api/Product/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)

@@ -15,5 +15,7 @@ namespace BookStore.DataAccessObject.IRepository
         Task UpdateProductAsync(Product product);
         Task DeleteProductAsync(int id);
         Task<IEnumerable<Product>> SearchProductsAsync(string searchTerm); // Đã cập nhật cho tìm kiếm linh hoạt
+        Task<IEnumerable<Product>> GetProductByCategoryIdAsync(int categoryId);
+
     }
 }

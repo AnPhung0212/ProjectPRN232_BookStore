@@ -15,5 +15,6 @@ namespace BookStore.Services.Interfaces
         Task UpdateProductAsync(UpdateProductDTO product);
         Task DeleteProductAsync(int id);
         Task<IEnumerable<ProductDTO>> SearchProductsAsync(string searchTerm);
+        Task<IEnumerable<ProductDTO>> GetProductsByCategoryAsync(int id);
     }
 }

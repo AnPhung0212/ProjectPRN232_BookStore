@@ -55,5 +55,13 @@ namespace BookStore.DataAccessObject.DAO
                                  .Where(p => p.Title.Contains(info)||p.Description.Contains(info) || p.Author.Contains(info) || p.Category.CategoryName.Contains(info))
                                  .ToListAsync();
         }
+        public async Task<IEnumerable<Product>> GetProductByCategoryIdAsync(int id)
+        {
+            return await _context.Products
+                                 .Include(p => p.Category)
+                                 .Where(p => p.CategoryId == id)
+                                 .ToListAsync();
+        }
+
     }
 }

@@ -20,5 +20,9 @@ namespace BookStore.BusinessObject.DTO
         public int? Stock { get; set; }
         public string? ImageUrl { get; set; }
 
+        // xử lý name category
+        public string? CategoryName { get; set; }
+
+
     }
 }

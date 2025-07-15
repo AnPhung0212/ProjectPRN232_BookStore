@@ -1,0 +1,403 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiệu Sách Tương Lai</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1E3A8A, #6B21A8);
+            --neon-orange: #FF5733;
+            --light-bg: #FFFFFF;
+            --shadow-neon: 0 0 20px rgba(107, 33, 168, 0.5);
+            --text-color: #F1F5F9;
+            --card-border: linear-gradient(135deg, #3B82F6, #A855F7);
+        }
+
+        body {
+            background: linear-gradient(to bottom, var(--light-bg), #E0E7FF);
+            font-family: 'Poppins', sans-serif;
+            color: #1F2937;
+            line-height: 1.6;
+            transition: padding-bottom 0.3s;
+        }
+
+        /* Notification */
+        .notification-bar {
+            background: var(--neon-orange);
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--primary-gradient);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-neon);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-color) !important;
+        }
+
+        .nav-link {
+            color: var(--text-color) !important;
+            transition: all 0.3s;
+        }
+
+            .nav-link:hover {
+                transform: translateY(-2px);
+                color: var(--neon-orange) !important;
+            }
+
+        .form-control {
+            border-radius: 20px;
+            border: none;
+        }
+
+        .cart-icon {
+            position: relative;
+            color: var(--text-color);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: var(--neon-orange);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+
+        /* Banner */
+        .banner {
+            background: var(--primary-gradient);
+            color: var(--text-color);
+            padding: 4rem 0;
+        }
+
+            .banner h1 {
+                font-weight: 600;
+                font-size: 2.5rem;
+            }
+
+        .btn-buy {
+            background: var(--neon-orange);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-neon);
+        }
+
+            .btn-buy:hover {
+                background: #F97316;
+                transform: scale(1.05);
+            }
+
+        /* Books Section */
+        .book-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-neon);
+            transition: all 0.3s;
+            background: var(--light-bg);
+            position: relative;
+        }
+
+            .book-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: 15px;
+                border: 2px solid transparent;
+                background: var(--card-border);
+                -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+                -webkit-mask-composite: destination-out;
+                mask-composite: exclude;
+            }
+
+            .book-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 15px 30px rgba(107, 33, 168, 0.3);
+            }
+
+            .book-card img {
+                height: 250px;
+                width: 100%;
+                object-fit: cover;
+            }
+
+            .book-card .card-body {
+                padding: 1.5rem;
+            }
+
+        .book-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Filter */
+        .filter-box {
+            background: var(--light-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-neon);
+        }
+
+        /* Reviews */
+        .review-card {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-neon);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-gradient);
+            padding: 3rem 0;
+            color: var(--text-color);
+        }
+
+            footer a {
+                color: var(--text-color);
+                transition: all 0.3s;
+            }
+
+                footer a:hover {
+                    color: var(--neon-orange);
+                }
+
+        /* Chatbox */
+        .chatbox {
+            position: fixed;
+            bottom: 80px; /* Dịch lên một chút */
+            right: 20px;
+            width: 300px;
+            background: var(--light-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow-neon);
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .chatbox-header {
+            background: var(--primary-gradient);
+            color: var(--text-color);
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .chatbox-body {
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+        }
+
+        .chatbox-footer {
+            padding: 10px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            gap: 10px;
+        }
+
+            .chatbox-footer input {
+                flex: 1;
+                padding: 8px;
+                border-radius: 20px;
+                border: 1px solid #D1D5DB;
+            }
+
+            .chatbox-footer button {
+                background: var(--neon-orange);
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 20px;
+                cursor: pointer;
+            }
+
+                .chatbox-footer button:hover {
+                    background: #F97316;
+                }
+
+        .chatbox-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--neon-orange);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-neon);
+            cursor: pointer;
+            z-index: 1001;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Notification Bar -->
+    <div class="notification-bar">
+        Miễn phí vận chuyển cho đơn hàng từ 500.000đ - Chỉ hôm nay!
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            @* <a class="navbar-link" href="#">Hiệu Sách An</a> *@
+            <a class="nav-link" asp-controller="Home" asp-action="Index">Hiệu Sách An</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" asp-controller="ProductMVC" asp-action="Index">Xem Sách</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Bán Chạy</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Giảm Giá</a></li>
+                </ul>
+                @*                 <form class="d-flex me-3">
+                    <input class="form-control me-2" type="search" placeholder="Tìm sách..." aria-label="Search">
+                    <button class="btn btn-light" type="submit"><i class="fas fa-search"></i></button>
+                </form> *@
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link cart-icon" href="#">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-user"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Banner -->
+    <div class="banner text-center">
+        <div class="container">
+            <h1>Khám Phá Thế Giới Sách</h1>
+            <p>Ưu đãi toàn bộ sách - Chỉ trong tháng này!</p>
+            <button class="btn btn-buy mt-3">Mua Ngay</button>
+        </div>
+    </div>
+   <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Liên Hệ</h5>
+                    <p>Email: contact@hieusach.com</p>
+                    <p>Phone: 0123-456-789</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Chính Sách</h5>
+                    <a href="#">Bảo Mật</a><br>
+                    <a href="#">Điều Khoản</a>
+                </div>
+                <div class="col-md-4">
+                    <h5>Theo Dõi</h5>
+                    <a href="#" class="me-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbox -->
+    <div class="chatbox" id="chatbox" style="display: none;">
+        <div class="chatbox-header">Hỗ Trợ Trực Tuyến</div>
+        <div class="chatbox-body">
+            <p>Xin chào! Chúng tôi có thể giúp gì cho bạn?</p>
+        </div>
+        <div class="chatbox-footer">
+            <input type="text" placeholder="Nhập tin nhắn..." id="chatInput">
+            <button onclick="sendMessage()">Gửi</button>
+        </div>
+    </div>
+    <button class="chatbox-toggle" id="chatToggle">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Xử lý tên sách dài
+        document.addEventListener('DOMContentLoaded', function () {
+            const bookTitles = document.querySelectorAll('.book-title');
+            bookTitles.forEach(title => {
+                const text = title.textContent.trim();
+                if (text.length > 20) {
+                    title.textContent = text.substring(0, 17) + '...';
+                }
+            });
+
+            // Xử lý toggle chatbox và dịch màn hình
+            const chatbox = document.getElementById('chatbox');
+            const chatToggle = document.getElementById('chatToggle');
+            chatToggle.addEventListener('click', function () {
+                if (chatbox.style.display === 'none' || chatbox.style.display === '') {
+                    chatbox.style.display = 'block';
+                    document.body.style.paddingBottom = '350px'; // Dịch màn hình lên
+                } else {
+                    chatbox.style.display = 'none';
+                    document.body.style.paddingBottom = '0'; // Trả về bình thường
+                }
+            });
+        });
+
+        // Hàm gửi tin nhắn (giả lập)
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                const chatBody = document.querySelector('.chatbox-body');
+                const newMessage = document.createElement('p');
+                newMessage.textContent = 'Bạn: ' + message;
+                chatBody.appendChild(newMessage);
+                input.value = ''; // Xóa ô nhập
+                chatBody.scrollTop = chatBody.scrollHeight; // Cuộn xuống dưới
+            }
+        }
+    </script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

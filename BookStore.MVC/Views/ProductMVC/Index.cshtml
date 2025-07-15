@@ -1,0 +1,59 @@
+﻿@model BookStore.MVC.ViewModels.ProductListViewModel
+
+@{
+    ViewData["Title"] = "Tất cả Sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<br></br>
+<h2 class="mb-4 text-center">Tất cả Sách</h2>
+
+<!-- Filter Form -->
+<form method="get" class="row mb-4">
+    <div class="col-md-4">
+<select name="categoryId" class="form-select">
+    <option value="">-- Lọc theo danh mục --</option>
+    @foreach (var cat in Model.Categories)
+    {
+        var selected = Model.SelectedCategoryId == cat.CategoryId ? "selected=\"selected\"" : "";
+        @:<option value="@cat.CategoryId" @Html.Raw(selected)>@cat.CategoryName</option>
+    }
+</select>
+    </div>
+    <div class="col-md-4">
+        <input type="text" name="search" value="@Model.SearchKeyword" class="form-control" placeholder="Tìm kiếm..." />
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+    </div>
+</form>
+
+<!-- Product List -->
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    @if (Model.Products != null && Model.Products.Any())
+    {
+        foreach (var book in Model.Products)
+        {
+    <div class="col">
+    <a href="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="text-decoration-none text-dark">
+        <div class="book-card position-relative">
+            <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
+            <div class="card-body">
+                <h5 class="book-title">@book.Title</h5>
+                <p class="card-text">Tác giả: @book.Author</p>
+                <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
+                <button class="btn btn-buy w-100 position-relative z-1" onclick="event.stopPropagation(); event.preventDefault();">
+                    Thêm Vào Giỏ
+                </button>
+            </div>
+        </div>
+    </a>
+</div>
+        }
+    }
+    else
+    {
+        <div class="col-12 text-center">
+            <p>Không có sản phẩm nào phù hợp.</p>
+        </div>
+    }
+</div>

@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model BookStore.MVC.ViewModels.HomePageViewModel
+
+<!DOCTYPE html>
+<html lang="vi">
+<body>
+
+
+    <!-- Books Section -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Sách Đề Xuất</h2>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            @foreach (var book in Model.Top3ExpensiveProducts)
+            {
+                <div class="col">
+                    <a href="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="text-decoration-none text-dark">
+                        <div class="book-card position-relative">
+                            <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
+                            <div class="card-body">
+                                <h5 class="book-title">@book.Title</h5>
+                                <p class="card-text">Tác giả: @book.Author</p>
+                                <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
+                                <button class="btn btn-buy w-100 position-relative z-1" onclick="event.stopPropagation(); event.preventDefault();">
+                                    Thêm Vào Giỏ
+                                </button>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+
+    <!-- Filter Section -->
+    <div class="container my-5">
+        <div class="filter-box">
+            <h3>Sách mới</h3>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @foreach (var book in Model.Top3NewestProducts)
+                {
+                    <div class="col">
+                        <a href="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="text-decoration-none text-dark">
+                            <div class="book-card position-relative">
+                                <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
+                                <div class="card-body">
+                                    <h5 class="book-title">@book.Title</h5>
+                                    <p class="card-text">Tác giả: @book.Author</p>
+                                    <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
+                                    <button class="btn btn-buy w-100 position-relative z-1" onclick="event.stopPropagation(); event.preventDefault();">
+                                        Thêm Vào Giỏ
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Đánh Giá Khách Hàng</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="review-card">
+                    <p>"Sách chất lượng, giao hàng siêu nhanh!"</p>
+                    <small class="text-muted">- Nguyễn Văn A</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
