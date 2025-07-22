@@ -11,6 +11,7 @@ namespace BookStore.MVC.Controllers
     public class HomeController : Controller
     {
         private readonly IHttpClientFactory _clientFactory;
+        
         public HomeController(IHttpClientFactory clientFactory)
         {
             _clientFactory = clientFactory;

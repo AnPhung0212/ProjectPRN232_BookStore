@@ -1,0 +1,74 @@
+﻿@using BookStore.BusinessObject.DTO.DtoForOrder
+@model List<OrderDTO>
+
+<h2>Lịch sử đơn hàng</h2>
+<p>User ID: @ViewBag.UserId</p>
+
+@if (!Model.Any())
+{
+    <p>Không có đơn hàng nào.</p>
+}
+else
+{
+    foreach (var order in Model)
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                <strong>Đơn hàng #@order.OrderId</strong> - Ngày: @order.OrderDate?.ToString("dd/MM/yyyy") - Trạng thái: @order.StatusName
+                <div class="mt-2">
+                    <span>Số điện thoại: @order.Phone</span> |
+                    <span>Phương thức thanh toán: @order.PaymentMethod</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">Ảnh</th>
+                            <th>Sản phẩm</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in order.OrderDetails)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@Url.Content("~/images/" + item.ImageUrl)" alt="@item.ProductTitle" style="max-width: 80px; max-height: 80px;" />
+                                    }
+                                    else
+                                    {
+                                        <span>Không có ảnh</span>
+                                    }
+                                </td>
+                                <td>@item.ProductTitle</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.UnitPrice.ToString("N0") đ</td>
+                                <td>@((item.Quantity * item.UnitPrice).ToString("N0")) đ</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+
+<style>
+    .card-header span {
+        font-size: 0.9em;
+        color: #555;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .table img {
+        object-fit: cover;
+    }
+</style>

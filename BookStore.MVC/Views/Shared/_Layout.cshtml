@@ -398,7 +398,7 @@
                                 Hello, @(string.IsNullOrEmpty(userName) ? userEmail : userName)
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">User Profile</a></li>
+                                <li><a class="dropdown-item" asp-controller="User" asp-action="Index">User Profile</a></li>
 
                                 @if (role == "Admin")
                                 {

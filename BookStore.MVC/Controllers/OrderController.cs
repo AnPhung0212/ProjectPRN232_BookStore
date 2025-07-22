@@ -6,9 +6,11 @@ using BookStore.MVC.Helpers;
 using BookStore.MVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 
 namespace BookStore.MVC.Controllers
 {
@@ -127,6 +129,43 @@ namespace BookStore.MVC.Controllers
             ViewBag.SuccessMessage = TempData["Success"];
             return View(order); // Truyền đúng model OrderDTO vào view
         }
+        public async Task<IActionResult> OrderHistory()
+        {
+            var userIdStr = HttpContext.Session.GetString("UserId");
 
+            if (string.IsNullOrEmpty(userIdStr))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            int userId = int.Parse(userIdStr);
+
+            ViewBag.UserId = userId;
+
+            var client = _clientFactory.CreateClient("BookStoreApi");
+
+            // Nếu cần token auth:
+            var token = HttpContext.Session.GetString("JWToken");
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+
+            var response = await client.GetAsync($"orders/user/{userId}");
+            Console.WriteLine($"[OrderHistory] Status: {response.StatusCode}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var orders = System.Text.Json.JsonSerializer.Deserialize<List<OrderDTO>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+                return View(orders);
+            }
+            else
+            {
+                ViewBag.Error = "Không thể lấy lịch sử đơn hàng.";
+                return View(new List<OrderDTO>());
+            }
+        }
     }
 }

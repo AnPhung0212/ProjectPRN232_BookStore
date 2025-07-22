@@ -57,7 +57,6 @@ namespace BookStore.API.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        [Authorize(Roles = "Customer,Admin")]
         public async Task<IActionResult> GetByUserId(int userId)
         {
             var orders = await _service.GetOrdersByUserIdAsync(userId);
