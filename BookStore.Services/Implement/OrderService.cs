@@ -2,6 +2,7 @@
 using BookStore.BusinessObject.Models;
 using BookStore.DataAccessObject.IRepository;
 using BookStore.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace BookStore.Services.Implement
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _repo;
+        private readonly IProductRepository _productRepository;
 
-        public OrderService(IOrderRepository repo)
+        public OrderService(IOrderRepository repo, IProductRepository productRepository)
         {
             _repo = repo;
+            _productRepository = productRepository;
         }
 
         public async Task<IEnumerable<OrderDTO>> GetAllAsync()
@@ -42,16 +45,40 @@ namespace BookStore.Services.Implement
                 ShippingAddress = dto.ShippingAddress,
                 PaymentMethod = dto.PaymentMethod,
                 Phone = dto.Phone,
-                OrderDetails = dto.Items.Select(i => new OrderDetail
-                {
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice
-                }).ToList()
+                OrderDetails = new List<OrderDetail>()
             };
-            await _repo.AddAsync(order);
-            return order.OrderId;
 
+            // Duyệt qua từng item và kiểm tra tồn kho
+            foreach (var item in dto.Items)
+            {
+                var product = await _productRepository.GetProductByIdAsync(item.ProductId);
+                if (product == null)
+                {
+                    throw new Exception($"Không tìm thấy sản phẩm có ID {item.ProductId}.");
+                }
+
+                if (product.Stock == null || product.Stock < item.Quantity)
+                {
+                    throw new Exception($"Sản phẩm '{product.Title}' không đủ hàng. Tồn kho: {product.Stock}, yêu cầu: {item.Quantity}.");
+                }
+
+                // Trừ số lượng tồn kho
+                product.Stock -= item.Quantity;
+                await _productRepository.UpdateProductAsync(product);
+
+                // Thêm vào chi tiết đơn hàng
+                order.OrderDetails.Add(new OrderDetail
+                {
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice
+                });
+            }
+
+            // Thêm đơn hàng vào DB
+            await _repo.AddAsync(order);
+
+            return order.OrderId;
         }
 
         public async Task DeleteAsync(int id) => await _repo.DeleteAsync(id);
