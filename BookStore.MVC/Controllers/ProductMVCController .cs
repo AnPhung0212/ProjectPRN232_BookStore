@@ -57,18 +57,38 @@ namespace BookStore.MVC.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             var client = _clientFactory.CreateClient("BookStoreApi");
-            var response = await client.GetAsync($"Product/{id}");
 
+            // 1. Gọi API lấy thông tin sách
+            var response = await client.GetAsync($"Product/{id}");
             if (!response.IsSuccessStatusCode)
-            {
                 return NotFound();
-            }
 
             var json = await response.Content.ReadAsStringAsync();
-            var product = System.Text.Json.JsonSerializer.Deserialize<ProductViewModel>(json, new JsonSerializerOptions
+            var product = JsonSerializer.Deserialize<ProductViewModel>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
+
+            if (product?.CategoryId != null)
+            {
+                // 2. Gọi API lấy danh sách sách theo category
+                var categoryResponse = await client.GetAsync($"Product/category/{product.CategoryId}");
+                if (categoryResponse.IsSuccessStatusCode)
+                {
+                    var listJson = await categoryResponse.Content.ReadAsStringAsync();
+                    var books = JsonSerializer.Deserialize<List<ProductViewModel>>(listJson, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    // 3. Lọc ra tối đa 4 cuốn sách cùng category, khác id hiện tại
+                    product.RelatedBooks = books
+                        ?.Where(b => b.ProductId != product.ProductId)
+                        .OrderBy(x => Guid.NewGuid()) // random
+                        .Take(4)
+                        .ToList() ?? new List<ProductViewModel>();
+                }
+            }
 
             return View(product);
         }

@@ -3,7 +3,6 @@
     ViewData["Title"] = "Chi Tiết Sách";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@* @model BookStore.MVC.ViewModels.ProductDetailViewModel *@
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -14,51 +13,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #1E3A8A, #6B21A8);
-            --neon-orange: #FF5733;
-            --light-bg: #FFFFFF;
-            --shadow-neon: 0 0 20px rgba(107, 33, 168, 0.5);
-            --text-color: #F1F5F9;
-            --card-border: linear-gradient(135deg, #3B82F6, #A855F7);
-        }
-
         body {
-            background: linear-gradient(to bottom, var(--light-bg), #E0E7FF);
+            background: linear-gradient(to bottom, #FFFFFF, #E0E7FF);
             font-family: 'Poppins', sans-serif;
             color: #1F2937;
         }
 
-        .navbar {
-            background: var(--primary-gradient);
-            padding: 1rem 2rem;
-            box-shadow: var(--shadow-neon);
-        }
-
-        .navbar-brand, .nav-link {
-            color: var(--text-color) !important;
-        }
-
-        .nav-link:hover {
-            transform: translateY(-2px);
-            color: var(--neon-orange) !important;
-        }
-
-        .cart-icon .cart-badge {
-            background: var(--neon-orange);
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.8rem;
-            position: absolute;
-            top: -5px;
-            right: -10px;
-        }
-
         .product-detail-card {
-            background: var(--light-bg);
+            background: #FFFFFF;
             border-radius: 15px;
-            box-shadow: var(--shadow-neon);
+            box-shadow: 0 0 20px rgba(107, 33, 168, 0.2);
             padding: 2rem;
             margin-top: 2rem;
         }
@@ -66,134 +30,114 @@
         .product-detail-img {
             max-width: 100%;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         .rating-stars {
             color: #FFD700;
+            font-size: 1.2rem;
             margin-bottom: 1rem;
         }
 
         .btn-buy {
-            background: var(--neon-orange);
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: var(--shadow-neon);
-        }
-
-        .btn-buy:hover {
-            background: #F97316;
-            transform: scale(1.05);
-        }
-
-        .btn-outline {
-            border: 2px solid var(--neon-orange);
-            color: var(--neon-orange);
-            padding: 0.75rem 2rem;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-outline:hover {
-            background: var(--neon-orange);
+            background: #FF5733;
             color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
         }
 
-        .book-card {
-            border: none;
+            .btn-buy:hover {
+                background: #F97316;
+                transform: scale(1.05);
+            }
+
+        .related-books .book-card {
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: var(--shadow-neon);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
-            background: var(--light-bg);
-            position: relative;
+            background: #FFFFFF;
         }
 
-        .book-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 15px;
-            border: 2px solid transparent;
-            background: var(--card-border);
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            mask-composite: exclude;
-        }
+            .related-books .book-card:hover {
+                transform: translateY(-5px);
+            }
 
-        .book-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(107, 33, 168, 0.3);
-        }
+            .related-books .book-card img {
+                height: 200px;
+                width: 100%;
+                object-fit: cover;
+            }
 
-        .book-card img {
-            height: 250px;
-            width: 100%;
-            object-fit: cover;
-        }
-
-        .book-card .card-body {
-            padding: 1.5rem;
+        .related-books .card-body {
+            padding: 1rem;
         }
 
         .book-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
-        footer {
-            background: var(--primary-gradient);
-            padding: 3rem 0;
-            color: var(--text-color);
-        }
-
-        footer a {
-            color: var(--text-color);
-            transition: all 0.3s;
-        }
-
-        footer a:hover {
-            color: var(--neon-orange);
-        }
     </style>
 </head>
 <body>
 
-
-
     <!-- Product Detail -->
     <div class="container product-detail-card">
-        <div class="row">
-            <div class="col-md-5">
+        <div class="row align-items-center">
+            <div class="col-md-5 col-12">
                 <img src="@Url.Content(string.IsNullOrEmpty(Model.ImageUrl) ? "~/images/noimage.png" : "~/images/" + Model.ImageUrl)" class="product-detail-img" alt="@Model.Title">
             </div>
-            <div class="col-md-7">
+            <div class="col-md-7 col-12">
                 <h1 class="mb-2">@Model.Title</h1>
-                <p class="text-muted mb-1">Tác giả: @Model.Author</p>
+                <p class="text-muted mb-1">Tác giả: <strong>@Model.Author</strong></p>
+                <div class="rating-stars">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                    <span class="text-muted ms-2">(4.0 / 5)</span>
+                </div>
                 <p class="text-success fw-bold fs-3">@Model.Price.ToString("n0")₫</p>
                 <p><strong>Thể loại:</strong> @Model.CategoryName</p>
-                <p><strong>Tồn kho:</strong> @Model.Stock</p>
+                <p><strong>Tồn kho:</strong> <span class="@(Model.Stock > 0 ? "text-success" : "text-danger")">@Model.Stock</span></p>
                 <p class="mt-3"><strong>Mô tả:</strong> @Model.Description</p>
                 <div class="d-flex gap-3 mt-4">
-                    <button class="btn btn-buy">Thêm Vào Giỏ Hàng</button>
+                    <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-inline">
+                        <input type="hidden" name="productId" value="@Model.ProductId" />
+                        <button type="submit" class="btn btn-buy">Thêm Vào Giỏ Hàng</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Related Books -->
+    @if (Model.RelatedBooks != null && Model.RelatedBooks.Any())
+    {
+        <div class="container related-books mt-5">
+            <h3 class="mb-4">Sách Liên Quan</h3>
+            <div class="row">
+                @foreach (var related in Model.RelatedBooks)
+                {
+                    <div class="col-md-3 col-sm-6 mb-4">
+                        <a href="@Url.Action("Detail", "ProductMVC", new { id = related.ProductId })" class="text-decoration-none text-dark">
+                            <div class="book-card">
+                                <img src="@Url.Content(string.IsNullOrEmpty(related.ImageUrl) ? "~/images/noimage.png" : "~/images/" + related.ImageUrl)" alt="@related.Title">
+                                <div class="card-body">
+                                    <h5 class="book-title">@related.Title</h5>
+                                    <p class="text-muted">Tác giả: @related.Author</p>
+                                    <p class="text-success fw-bold">@related.Price.ToString("n0")₫</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

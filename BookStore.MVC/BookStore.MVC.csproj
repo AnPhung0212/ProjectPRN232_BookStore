@@ -10,4 +10,8 @@
     <PackageReference Include="Newtonsoft.Json" Version="8.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BookStore.BusinessObject\BookStore.BusinessObject.csproj" />
+  </ItemGroup>
+
 </Project>

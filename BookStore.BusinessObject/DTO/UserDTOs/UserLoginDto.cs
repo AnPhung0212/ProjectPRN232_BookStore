@@ -13,4 +13,11 @@ namespace BookStore.BusinessObject.DTO.UserDTOs
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
     }
+
+    public class UserResponseDto
+    {
+        public string Token { get; set; }
+        public UserDto User { get; set; }
+    }
+
 }

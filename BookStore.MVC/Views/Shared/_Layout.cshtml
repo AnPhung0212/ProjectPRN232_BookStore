@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using BookStore.MVC.Helpers
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -260,6 +261,90 @@
             cursor: pointer;
             z-index: 1001;
         }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #E5E7EB;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .cart-img {
+            width: 60px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .cart-item-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .cart-item-price {
+            color: #16A34A;
+            font-weight: 600;
+        }
+
+        .quantity-form {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-qty {
+            background: #FF5733;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+            .btn-qty:hover {
+                background: #F97316;
+            }
+
+        .qty-input {
+            width: 45px;
+            text-align: center;
+            border: 1px solid #D1D5DB;
+            border-radius: 5px;
+            padding: 0.25rem;
+        }
+
+        .remove-item-form {
+            margin-left: 1rem;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #EF4444;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+            .btn-delete:hover {
+                color: #DC2626;
+            }
+
     </style>
 </head>
 
@@ -289,12 +374,49 @@
                 </form> *@
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link cart-icon" href="#">
+                        <a class="nav-link cart-icon" asp-controller="Cart" asp-action="ViewCart">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-badge">0</span>
+                            @{
+                                var cart = Context.Session.GetObjectFromJson<BookStore.BusinessObject.DTO.CartDTOForSession>("CART_SESSION");
+                                var cartCount = cart?.Items?.Count ?? 0;
+                            }
+                            <span class="cart-badge">@cartCount</span>
                         </a>
+
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-user"></i></a></li>
+                    @* Các option login *@
+                    @{
+                        var userName = Context.Session.GetString("Username");
+                        var role = Context.Session.GetString("Role");
+                        var userEmail = Context.Session.GetString("UserEmail");
+                    }
+
+                    @if (!string.IsNullOrEmpty(userName) || !string.IsNullOrEmpty(userEmail))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Hello, @(string.IsNullOrEmpty(userName) ? userEmail : userName)
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">User Profile</a></li>
+
+                                @if (role == "Admin")
+                                {
+                                    <li><a class="dropdown-item" href="#">Admin Dashboard</a></li>
+                                }
+
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login"><i class="fas fa-user"></i></a>
+                        </li>
+                    }
+
+
                 </ul>
             </div>
         </div>
@@ -353,8 +475,7 @@
         <i class="fas fa-comment"></i>
     </button>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Custom JS -->
     <script>
         // Xử lý tên sách dài

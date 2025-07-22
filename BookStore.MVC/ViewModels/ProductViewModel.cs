@@ -12,7 +12,10 @@
             public int? Stock { get; set; }
             public string? ImageUrl { get; set; }
             public string? CategoryName { get; set; } // thêm tùy chọn
-        }
+
+            public List<ProductViewModel> RelatedBooks { get; set; } = new List<ProductViewModel>();
 
     }
+
+}
 

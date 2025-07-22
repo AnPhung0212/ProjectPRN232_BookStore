@@ -5,19 +5,54 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <br></br>
+<head>
+    <style>
+        /* Định dạng nút */
+        .btn-buy {
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            margin: 5px 0;
+        }
+
+        /* Nút Chi tiết sách */
+        .btn-detail {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .btn-detail:hover {
+            background-color: #0056b3;
+        }
+
+        /* Nút Thêm Vào Giỏ */
+        .btn-add-to-cart {
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+        }
+
+        .btn-add-to-cart:hover {
+            background-color: #e55a4e;
+        }
+    </style>
+</head>
 <h2 class="mb-4 text-center">Tất cả Sách</h2>
 
 <!-- Filter Form -->
 <form method="get" class="row mb-4">
     <div class="col-md-4">
-<select name="categoryId" class="form-select">
-    <option value="">-- Lọc theo danh mục --</option>
-    @foreach (var cat in Model.Categories)
-    {
-        var selected = Model.SelectedCategoryId == cat.CategoryId ? "selected=\"selected\"" : "";
-        @:<option value="@cat.CategoryId" @Html.Raw(selected)>@cat.CategoryName</option>
-    }
-</select>
+        <select name="categoryId" class="form-select">
+            <option value="">-- Lọc theo danh mục --</option>
+            @foreach (var cat in Model.Categories)
+            {
+                var selected = Model.SelectedCategoryId == cat.CategoryId ? "selected=\"selected\"" : "";
+                @:<option value="@cat.CategoryId" @Html.Raw(selected)>@cat.CategoryName</option>
+            }
+        </select>
     </div>
     <div class="col-md-4">
         <input type="text" name="search" value="@Model.SearchKeyword" class="form-control" placeholder="Tìm kiếm..." />
@@ -33,21 +68,26 @@
     {
         foreach (var book in Model.Products)
         {
-    <div class="col">
-    <a href="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="text-decoration-none text-dark">
-        <div class="book-card position-relative">
-            <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
-            <div class="card-body">
-                <h5 class="book-title">@book.Title</h5>
-                <p class="card-text">Tác giả: @book.Author</p>
-                <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
-                <button class="btn btn-buy w-100 position-relative z-1" onclick="event.stopPropagation(); event.preventDefault();">
-                    Thêm Vào Giỏ
-                </button>
+            <div class="col">
+                <div class="book-card position-relative">
+                    <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
+                    <div class="card-body">
+                        <h5 class="book-title">@book.Title</h5>
+                        <p class="card-text">Tác giả: @book.Author</p>
+                        <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
+                    </div>
+
+                    <!-- Form thêm vào giỏ nằm ngoài <a> -->
+                    <form method="get" action="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="position-relative z-1 mt-2">
+                        <button type="submit" class="btn btn-buy btn-detail w-100">Chi tiết sách</button>
+                    </form>
+
+                    <form method="post" action="@Url.Action("AddToCart", "Cart")" class="position-relative z-1 mt-2">
+                        <input type="hidden" name="productId" value="@book.ProductId" />
+                        <button type="submit" class="btn btn-buy btn-add-to-cart w-100">Thêm Vào Giỏ</button>
+                    </form>
+                </div>
             </div>
-        </div>
-    </a>
-</div>
         }
     }
     else

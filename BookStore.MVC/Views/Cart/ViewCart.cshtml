@@ -1,0 +1,70 @@
+﻿@using BookStore.BusinessObject.DTO
+@using BookStore.MVC.Helpers
+@{
+    Layout = "_Layout";
+    var cart = Context.Session.GetObjectFromJson<CartDTOForSession>("CART_SESSION") ?? new CartDTOForSession();
+    decimal total = 0;
+    int shippingFee = 30000;
+}
+
+<div class="container cart-container">
+    <h2 class="text-center mb-4">Giỏ Hàng Của Bạn</h2>
+
+    <div class="cart-items">
+        @if (cart.Items.Any())
+        {
+            foreach (var item in cart.Items)
+            {
+                total += item.Quantity * (item.UnitPrice ?? 0);
+                <div class="cart-item">
+                    <img src="~/images/@item.ImageUrl" alt="@item.ProductName" class="cart-img">
+                    <div class="cart-item-details">
+                        <h5 class="cart-item-title">@item.ProductName</h5>
+                        <p class="cart-item-price">@String.Format("{0:N0}đ", item.UnitPrice)</p>
+                    </div>
+                    <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" style="display: flex; align-items:center;">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+
+                        <button type="submit" name="actionType" value="decrease">-</button>
+
+                        <input type="number" name="quantity" value="@item.Quantity" min="1" max="@item.Stock" onchange="this.form.submit()" />
+
+                        <button type="submit" name="actionType" value="increase">+</button>
+                    </form>
+                    <form asp-controller="Cart" asp-action="RemoveItem" method="post" class="remove-item-form">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+                        <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i></button>
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-muted">Giỏ hàng của bạn đang trống.</p>
+        }
+
+    </div>
+</div>
+
+<div class="container cart-summary">
+    <h3 class="mb-3">Tổng Quan Đơn Hàng</h3>
+    <div class="d-flex justify-content-between mb-2">
+        <span>Tạm tính (@cart.Items.Count sản phẩm):</span>
+        <span class="fw-bold">@String.Format("{0:N0}đ", total)</span>
+    </div>
+    <div class="d-flex justify-content-between mb-2">
+        <span>Phí vận chuyển:</span>
+        <span class="fw-bold">@String.Format("{0:N0}đ", shippingFee)</span>
+    </div>
+    <div class="d-flex justify-content-between mb-3">
+        <span>Tổng cộng:</span>
+        <span class="fw-bold text-success fs-4">@String.Format("{0:N0}đ", total + shippingFee)</span>
+    </div>
+    <div class="mb-3">
+        <label for="address" class="form-label fw-bold">Địa chỉ giao hàng (thêm số điện thoại ):</label>
+        <input type="text" class="address-input" name="ShippingAddress" placeholder="Nhập địa chỉ giao hàng..." />
+    </div>
+    <form asp-controller="Order" asp-action="Checkout" method="post">
+        <button type="submit" class="btn-checkout">Thanh Toán</button>
+    </form>
+</div>

@@ -2,13 +2,19 @@
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"];
 
+// ✅ Thêm dòng này để bật session
+builder.Services.AddSession();
+
+// Không bắt buộc, chỉ khi bạn cần TempData
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+// Cấu hình HTTP client gọi API
+var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"];
 builder.Services.AddHttpClient("BookStoreApi", client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl!);
 });
-
 
 var app = builder.Build();
 
@@ -16,7 +22,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -25,6 +30,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// ❗️ Quan trọng: phải thêm dòng này trước Authorization
+app.UseSession(); // ✅ KHÔNG ĐƯỢC THIẾU
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

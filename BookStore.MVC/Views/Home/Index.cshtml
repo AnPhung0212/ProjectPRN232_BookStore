@@ -6,9 +6,118 @@
 
 <!DOCTYPE html>
 <html lang="vi">
+<head>
+    <style>
+        /* Định dạng chung cho book-card */
+        .book-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fff;
+        }
+
+            .book-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .book-card img {
+                height: 200px;
+                object-fit: cover;
+                width: 100%;
+            }
+
+            .book-card .card-body {
+                padding: 15px;
+                text-align: center;
+            }
+
+        .book-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            height: 2.5em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .text-success {
+            font-size: 1rem;
+            color: #28a745 !important;
+        }
+
+        /* Định dạng nút */
+        .btn-buy {
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px 0;
+        }
+
+        /* Nút Chi tiết sách */
+        .btn-detail {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+            .btn-detail:hover {
+                background-color: #0056b3;
+                transform: scale(1.05);
+            }
+
+        /* Nút Thêm Vào Giỏ */
+        .btn-add-to-cart {
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+        }
+
+            .btn-add-to-cart:hover {
+                background-color: #e55a4e;
+                transform: scale(1.05);
+            }
+
+        /* Định dạng filter-box */
+        .filter-box {
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        /* Định dạng review-card */
+        .review-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #fff;
+            margin-bottom: 15px;
+        }
+
+            .review-card p {
+                font-style: italic;
+                color: #333;
+            }
+
+            .review-card small {
+                font-size: 0.85rem;
+            }
+    </style>
+</head>
 <body>
-
-
     <!-- Books Section -->
     <div class="container my-5">
         <h2 class="text-center mb-4">Sách Đề Xuất</h2>
@@ -16,24 +125,28 @@
             @foreach (var book in Model.Top3ExpensiveProducts)
             {
                 <div class="col">
-                    <a href="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="text-decoration-none text-dark">
-                        <div class="book-card position-relative">
-                            <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
-                            <div class="card-body">
-                                <h5 class="book-title">@book.Title</h5>
-                                <p class="card-text">Tác giả: @book.Author</p>
-                                <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
-                                <button class="btn btn-buy w-100 position-relative z-1" onclick="event.stopPropagation(); event.preventDefault();">
-                                    Thêm Vào Giỏ
-                                </button>
-                            </div>
+                    <div class="book-card position-relative">
+                        <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
+                        <div class="card-body">
+                            <h5 class="book-title">@book.Title</h5>
+                            <p class="card-text">Tác giả: @book.Author</p>
+                            <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
                         </div>
-                    </a>
+
+                        <!-- Form thêm vào giỏ nằm ngoài <a> -->
+                        <form method="get" action="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="position-relative z-1 mt-2">
+                            <button type="submit" class="btn btn-buy btn-detail w-100">Chi tiết sách</button>
+                        </form>
+
+                        <form method="post" action="@Url.Action("AddToCart", "Cart")" class="position-relative z-1 mt-2">
+                            <input type="hidden" name="productId" value="@book.ProductId" />
+                            <button type="submit" class="btn btn-buy btn-add-to-cart w-100">Thêm Vào Giỏ</button>
+                        </form>
+                    </div>
                 </div>
             }
         </div>
     </div>
-
 
     <!-- Filter Section -->
     <div class="container my-5">
@@ -43,22 +156,26 @@
                 @foreach (var book in Model.Top3NewestProducts)
                 {
                     <div class="col">
-                        <a href="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="text-decoration-none text-dark">
-                            <div class="book-card position-relative">
-                                <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
-                                <div class="card-body">
-                                    <h5 class="book-title">@book.Title</h5>
-                                    <p class="card-text">Tác giả: @book.Author</p>
-                                    <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
-                                    <button class="btn btn-buy w-100 position-relative z-1" onclick="event.stopPropagation(); event.preventDefault();">
-                                        Thêm Vào Giỏ
-                                    </button>
-                                </div>
+                        <div class="book-card position-relative">
+                            <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
+                            <div class="card-body">
+                                <h5 class="book-title">@book.Title</h5>
+                                <p class="card-text">Tác giả: @book.Author</p>
+                                <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
                             </div>
-                        </a>
+
+                            <!-- Form thêm vào giỏ nằm ngoài <a> -->
+                            <form method="get" action="@Url.Action("Detail", "ProductMVC", new { id = book.ProductId })" class="position-relative z-1 mt-2">
+                                <button type="submit" class="btn btn-buy btn-detail w-100">Chi tiết sách</button>
+                            </form>
+
+                            <form method="post" action="@Url.Action("AddToCart", "Cart")" class="position-relative z-1 mt-2">
+                                <input type="hidden" name="productId" value="@book.ProductId" />
+                                <button type="submit" class="btn btn-buy btn-add-to-cart w-100">Thêm Vào Giỏ</button>
+                            </form>
+                        </div>
                     </div>
                 }
-
             </div>
         </div>
     </div>
@@ -75,7 +192,5 @@
             </div>
         </div>
     </div>
-
-
 </body>
 </html>
