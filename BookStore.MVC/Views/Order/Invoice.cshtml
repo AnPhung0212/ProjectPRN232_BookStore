@@ -1,0 +1,190 @@
+﻿@model BookStore.BusinessObject.DTO.DtoForOrder.OrderDTO
+@{
+    ViewData["Title"] = "Hóa đơn";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .invoice-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            transition: transform 0.3s ease;
+        }
+
+            .invoice-container:hover {
+                transform: translateY(-5px);
+            }
+
+        .invoice-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 30px;
+        }
+
+            .invoice-header h2 {
+                color: #1a73e8;
+                font-weight: 700;
+                font-size: 2.2rem;
+            }
+
+        .info-card, .details-card {
+            border: none;
+            border-radius: 10px;
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+            .info-card h4, .details-card h4 {
+                color: #343a40;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+
+            .info-card p {
+                margin: 0;
+                font-size: 1rem;
+                color: #495057;
+            }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.2s ease;
+        }
+
+            .product-item:hover {
+                background: #e9f0ff;
+            }
+
+            .product-item img {
+                max-width: 80px;
+                border-radius: 8px;
+                margin-right: 20px;
+            }
+
+        .product-title {
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .product-details p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #dc3545;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #1a73e8;
+            border: none;
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            transition: background 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #1557b0;
+            }
+
+        .brand-name {
+            color: #1a73e8;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container invoice-container">
+        <div class="invoice-header">
+            <h2>HÓA ĐƠN MUA HÀNG</h2>
+        </div>
+
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="success-message">
+                @ViewBag.SuccessMessage
+            </div>
+        }
+
+        <div class="info-card">
+            <h4>Thông tin đơn hàng</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Mã đơn hàng:</strong> @Model.OrderId</p>
+                    <p><strong>Ngày đặt hàng:</strong> @Model.OrderDate?.ToString("dd/MM/yyyy HH:mm")</p>
+                    <p><strong>Trạng thái:</strong> @Model.StatusName</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Địa chỉ giao hàng:</strong> @Model.ShippingAddress</p>
+                    <p><strong>Số điện thoại:</strong> @Model.Phone</p>
+                    <p><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-card">
+            <h4>Chi tiết sản phẩm</h4>
+            @foreach (var item in Model.OrderDetails)
+            {
+                <div class="product-item">
+                    <img src="~/images/@item.ImageUrl" alt="@item.ProductTitle" class="img-fluid" />
+                    <div class="product-info flex-grow-1">
+                        <h5 class="product-title">@item.ProductTitle</h5>
+                    </div>
+                    <div class="product-details text-end">
+                        <p>Số lượng: <strong>@item.Quantity</strong></p>
+                        <p>Đơn giá: <strong>@item.UnitPrice.ToString("N0") ₫</strong></p>
+                        <p>Thành tiền: <strong>@(item.Quantity * item.UnitPrice) ₫</strong></p>
+                    </div>
+                </div>
+            }
+            <div class="text-end mt-4">
+                <h4 class="total-amount">Tổng cộng: @Model.TotalAmount?.ToString("N0") ₫</h4>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <p class="text-success fw-bold">
+                Đơn hàng của bạn đã được đặt thành công! Cảm ơn bạn đã mua hàng tại <span class="brand-name">AnBookStore</span>.
+            </p>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Quay lại trang chủ</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

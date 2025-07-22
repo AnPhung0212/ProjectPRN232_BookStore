@@ -90,8 +90,8 @@ namespace BookStore.MVC.Controllers
         public IActionResult UpdateQuantity(int productId, int quantity, string actionType)
         {
             var cart = GetCartFromSession();
-
             var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+
             if (item == null)
             {
                 TempData["Error"] = "Không tìm thấy sản phẩm trong giỏ.";
@@ -118,7 +118,7 @@ namespace BookStore.MVC.Controllers
                     item.Quantity--;
                 }
             }
-            else // nhập số trực tiếp
+            else if (actionType == "direct")
             {
                 if (quantity < 1)
                 {
@@ -138,7 +138,6 @@ namespace BookStore.MVC.Controllers
             SaveCartToSession(cart);
             return RedirectToAction("ViewCart");
         }
-
 
 
         [HttpPost]

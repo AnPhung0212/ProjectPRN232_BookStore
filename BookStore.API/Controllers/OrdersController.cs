@@ -3,6 +3,8 @@ using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BookStore.API.Controllers
 {
@@ -33,8 +35,17 @@ namespace BookStore.API.Controllers
         [Authorize(Roles = "Customer")]
         public async Task<IActionResult> Create([FromBody] OrderCreateDTO dto)
         {
-            await _service.CreateAsync(dto);
-            return Ok(new { message = "Order created successfully" });
+            // Lấy UserId từ JWT token
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized("UserId claim not found.");
+            }
+
+            dto.UserId = int.Parse(userIdClaim.Value);
+            int orderid = await _service.CreateAsync(dto);
+
+            return Ok(orderid);
         }
 
         [HttpDelete("{id}")]

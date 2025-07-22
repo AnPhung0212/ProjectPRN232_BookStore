@@ -31,7 +31,7 @@ namespace BookStore.Services.Implement
             return order != null ? MapToDto(order) : null;
         }
 
-        public async Task CreateAsync(OrderCreateDTO dto)
+        public async Task<int> CreateAsync(OrderCreateDTO dto)
         {
             var order = new Order
             {
@@ -41,6 +41,7 @@ namespace BookStore.Services.Implement
                 StatusId = 1, // default pending
                 ShippingAddress = dto.ShippingAddress,
                 PaymentMethod = dto.PaymentMethod,
+                Phone = dto.Phone,
                 OrderDetails = dto.Items.Select(i => new OrderDetail
                 {
                     ProductId = i.ProductId,
@@ -49,6 +50,8 @@ namespace BookStore.Services.Implement
                 }).ToList()
             };
             await _repo.AddAsync(order);
+            return order.OrderId;
+
         }
 
         public async Task DeleteAsync(int id) => await _repo.DeleteAsync(id);
@@ -70,12 +73,14 @@ namespace BookStore.Services.Implement
             StatusName = o.Status?.StatusName,
             ShippingAddress = o.ShippingAddress,
             PaymentMethod = o.PaymentMethod,
+            Phone = o.Phone, // Bổ sung dòng này
             OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
             {
                 ProductId = od.ProductId ?? 0,
                 ProductTitle = od.Product?.Title,
                 Quantity = od.Quantity,
-                UnitPrice = od.UnitPrice
+                UnitPrice = od.UnitPrice,
+                ImageUrl = od.Product?.ImageUrl
             }).ToList()
         };
     }

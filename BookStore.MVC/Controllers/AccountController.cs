@@ -39,6 +39,7 @@ namespace BookStore.MVC.Controllers
                 HttpContext.Session.SetString("JWToken", result.Token);
                 HttpContext.Session.SetString("Username", result.User.Username);
                 HttpContext.Session.SetString("UserEmail", result.User.Email);
+                HttpContext.Session.SetString("UserId", result.User.UserId.ToString());
                 HttpContext.Session.SetString("Role", result.User.RoleName ?? "Customer");
                 return RedirectToAction("Index", "Home");
             }

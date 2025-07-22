@@ -6,6 +6,11 @@
     decimal total = 0;
     int shippingFee = 30000;
 }
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 
 <div class="container cart-container">
     <h2 class="text-center mb-4">Giỏ Hàng Của Bạn</h2>
@@ -24,13 +29,24 @@
                     </div>
                     <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" style="display: flex; align-items:center;">
                         <input type="hidden" name="productId" value="@item.ProductId" />
+                        <input type="hidden" name="actionType" value="" class="action-type" />
 
-                        <button type="submit" name="actionType" value="decrease">-</button>
+                        <button type="submit" onclick="this.form.querySelector('.action-type').value='decrease';">-</button>
 
-                        <input type="number" name="quantity" value="@item.Quantity" min="1" max="@item.Stock" onchange="this.form.submit()" />
+                        <input type="number" name="quantity" value="@item.Quantity" min="1" max="@item.Stock"
+                               onchange="setTimeout(() => { this.form.querySelector('.action-type').value='direct'; this.form.submit(); }, 10);" />
 
-                        <button type="submit" name="actionType" value="increase">+</button>
+                        <button type="submit" onclick="this.form.querySelector('.action-type').value='increase';">+</button>
                     </form>
+
+                    <script>
+                        function setManualActionType(form) {
+                            if (!form.actionType.value) {
+                                form.actionType.value = 'direct';
+                            }
+                            return true;
+                        }
+                    </script>
                     <form asp-controller="Cart" asp-action="RemoveItem" method="post" class="remove-item-form">
                         <input type="hidden" name="productId" value="@item.ProductId" />
                         <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i></button>
@@ -60,11 +76,38 @@
         <span>Tổng cộng:</span>
         <span class="fw-bold text-success fs-4">@String.Format("{0:N0}đ", total + shippingFee)</span>
     </div>
-    <div class="mb-3">
-        <label for="address" class="form-label fw-bold">Địa chỉ giao hàng (thêm số điện thoại ):</label>
-        <input type="text" class="address-input" name="ShippingAddress" placeholder="Nhập địa chỉ giao hàng..." />
-    </div>
+
     <form asp-controller="Order" asp-action="Checkout" method="post">
+        <div class="mb-3">
+            <label for="address" class="form-label fw-bold">Địa chỉ giao hàng:</label>
+            <input type="text" class="form-control" id="address" name="ShippingAddress" placeholder="Nhập địa chỉ giao hàng..." required />
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label fw-bold">Số điện thoại:</label>
+            <input type="tel" class="form-control" id="phone" name="PhoneNumber" placeholder="Nhập số điện thoại..." pattern="0[0-9]{9,10}" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Phương thức thanh toán:</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="PaymentMethod" id="cash" value="Cash" checked />
+                <label class="form-check-label" for="cash">Thanh toán tiền mặt khi nhận hàng</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="PaymentMethod" id="bank" value="BankTransfer" />
+                <label class="form-check-label" for="bank">Chuyển khoản ngân hàng</label>
+            </div>
+        </div>
+
         <button type="submit" class="btn-checkout">Thanh Toán</button>
     </form>
+    <script>
+        function setManualActionType(form) {
+            if (!form.actionType.value) {
+                form.actionType.value = 'direct';
+            }
+            return true;
+        }
+    </script>
 </div>

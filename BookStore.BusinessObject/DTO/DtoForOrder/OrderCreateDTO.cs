@@ -12,6 +12,8 @@ namespace BookStore.BusinessObject.DTO.DtoForOrder
         public string ShippingAddress { get; set; } = null!;
         public string PaymentMethod { get; set; } = null!;
         public List<OrderItemCreateDTO> Items { get; set; } = new();
+        public string? Phone { get; set; }
+
     }
 
     public class OrderItemCreateDTO

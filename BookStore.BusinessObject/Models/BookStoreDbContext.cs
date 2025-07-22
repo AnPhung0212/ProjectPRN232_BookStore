@@ -92,6 +92,7 @@ public partial class BookStoreDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.PaymentMethod).HasMaxLength(100);
+            entity.Property(e => e.Phone).HasMaxLength(20);
             entity.Property(e => e.ShippingAddress).HasMaxLength(255);
             entity.Property(e => e.StatusId).HasColumnName("StatusID");
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
