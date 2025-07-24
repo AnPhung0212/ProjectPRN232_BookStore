@@ -1,0 +1,524 @@
+﻿@model BookStore.MVC.ViewModels.DashboardViewModel
+@using Newtonsoft.Json
+@{
+    ViewBag.Title = "Thống kê tổng quan";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">📊 Thống kê Hệ thống</h2>
+        <p class="text-muted">Tổng quan về hoạt động của cửa hàng sách</p>
+    </div>
+
+    <!-- Tổng quan -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3 col-sm-6">
+            <div class="book-card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-2x mb-3" style="color: var(--neon-orange);"></i>
+                    <h5 class="card-title fw-semibold">Tổng Sách</h5>
+                    <p class="card-text display-5 fw-bold" style="color: var(--neon-orange);">@Model.TotalBooks</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="book-card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-shopping-cart fa-2x mb-3" style="color: var(--neon-orange);"></i>
+                    <h5 class="card-title fw-semibold">Tổng Đơn Hàng</h5>
+                    <p class="card-text display-5 fw-bold" style="color: var(--neon-orange);">@Model.TotalOrders</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="book-card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-money-bill-wave fa-2x mb-3" style="color: var(--neon-orange);"></i>
+                    <h5 class="card-title fw-semibold">Doanh Thu</h5>
+                    <p class="card-text display-5 fw-bold" style="color: var(--neon-orange);">@Model.TotalRevenue.ToString("C", new System.Globalization.CultureInfo("vi-VN"))</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="book-card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-list fa-2x mb-3" style="color: var(--neon-orange);"></i>
+                    <h5 class="card-title fw-semibold">Thể Loại</h5>
+                    <p class="card-text display-5 fw-bold" style="color: var(--neon-orange);">@Model.TotalCategories</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="book-card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user fa-2x mb-3" style="color: var(--neon-orange);"></i>
+                    <h5 class="card-title fw-semibold">Tác Giả</h5>
+                    <p class="card-text display-5 fw-bold" style="color: var(--neon-orange);">@Model.TotalAuthors</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="book-card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-box-open fa-2x mb-3" style="color: var(--neon-orange);"></i>
+                    <h5 class="card-title fw-semibold">Số Lượng Sách Đã Bán</h5>
+                    <p class="card-text display-5 fw-bold" style="color: var(--neon-orange);">@Model.TotalBooksSold</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="book-card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-warehouse fa-2x mb-3" style="color: var(--neon-orange);"></i>
+                    <h5 class="card-title fw-semibold">Tổng Tồn Kho</h5>
+                    <p class="card-text display-5 fw-bold" style="color: var(--neon-orange);">@Model.TotalStock</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="book-card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="fw-semibold text-center mb-4">Sản Phẩm Theo Danh Mục</h3>
+                    <canvas id="categoryChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="book-card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="fw-semibold text-center mb-4">Tỷ Lệ Sách Đã Bán So Với Tồn Kho</h3>
+                    <canvas id="soldBooksChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="book-card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="fw-semibold text-center mb-4">Doanh Số Sách Theo Danh Mục</h3>
+                    <canvas id="categorySalesChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="book-card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="fw-semibold text-center mb-4">Trạng Thái Đơn Hàng</h3>
+                    <canvas id="orderStatusChart" style="max-height: 200px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="book-card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="fw-semibold text-center mb-4">Đơn Hàng Theo Ngày</h3>
+                    <canvas id="orderPerDayChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="book-card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="fw-semibold text-center mb-4">Doanh Thu Theo Ngày</h3>
+                    <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top sản phẩm bán chạy -->
+    <div class="book-card shadow-sm border-0 mt-5">
+        <div class="card-body">
+            <h3 class="fw-semibold text-center mb-4">Top 5 Sản Phẩm Bán Chạy</h3>
+            <ul class="list-group list-group-flush">
+                @foreach (var product in Model.TopProducts)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@product.ProductName</span>
+                        <span class="badge" style="background: var(--neon-orange); color: white;">@product.QuantitySold</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script>
+        // Đăng ký plugin datalabels
+        Chart.register(ChartDataLabels);
+
+        // Category Chart (Doughnut)
+        const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+        const categoryChart = new Chart(ctxCategory, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(JsonConvert.SerializeObject(Model.CategoryBookCounts.Keys)),
+                datasets: [{
+                    label: 'Sản phẩm theo danh mục',
+                    data: @Html.Raw(JsonConvert.SerializeObject(Model.CategoryBookCounts.Values)),
+                    backgroundColor: [
+                        'rgba(255, 87, 51, 0.7)', // --neon-orange
+                        'rgba(30, 58, 138, 0.7)', // --primary-gradient start
+                        'rgba(107, 33, 168, 0.7)', // --primary-gradient end
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 87, 51, 1)',
+                        'rgba(30, 58, 138, 1)',
+                        'rgba(107, 33, 168, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 2,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 14, family: 'Poppins' } }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        bodyFont: { size: 14, family: 'Poppins' },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                let total = context.dataset.data.reduce((a, b) => a + b, 0) || 1; // Tránh chia cho 0
+                                let percentage = ((value / total) * 100).toFixed(1) + '%';
+                                return `${label}: ${value} (${percentage})`;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        font: { size: 12, family: 'Poppins', weight: 'bold' },
+                        formatter: (value, context) => {
+                            let total = context.dataset.data.reduce((a, b) => a + b, 0) || 1; // Tránh chia cho 0
+                            let percentage = ((value / total) * 100).toFixed(1) + '%';
+                            return percentage;
+                        },
+                        anchor: 'center',
+                        align: 'center'
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+
+        // Sold Books Chart (Pie)
+        const ctxSoldBooks = document.getElementById('soldBooksChart').getContext('2d');
+        const soldBooksChart = new Chart(ctxSoldBooks, {
+            type: 'pie',
+            data: {
+                labels: ['Sách đã bán', 'Sách còn trong kho'],
+                datasets: [{
+                    label: 'Tỷ lệ sách đã bán so với tồn kho',
+                    data: [@Model.TotalBooksSold, Math.max(0, @Model.TotalStock - @Model.TotalBooksSold)],
+                    backgroundColor: [
+                        'rgba(30, 58, 138, 0.7)', // --primary-gradient start
+                        'rgba(209, 213, 219, 0.7)' // Gray for unsold
+                    ],
+                    borderColor: [
+                        'rgba(30, 58, 138, 1)',
+                        'rgba(209, 213, 219, 1)'
+                    ],
+                    borderWidth: 2,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 14, family: 'Poppins' } }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        bodyFont: { size: 14, family: 'Poppins' },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                let total = context.dataset.data.reduce((a, b) => a + b, 0) || 1; // Tránh chia cho 0
+                                let percentage = ((value / total) * 100).toFixed(1) + '%';
+                                return `${label}: ${value} (${percentage})`;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        font: { size: 12, family: 'Poppins', weight: 'bold' },
+                        formatter: (value, context) => {
+                            let total = context.dataset.data.reduce((a, b) => a + b, 0) || 1; // Tránh chia cho 0
+                            let percentage = ((value / total) * 100).toFixed(1) + '%';
+                            return percentage;
+                        },
+                        anchor: 'center',
+                        align: 'center'
+                    }
+                }
+            }
+        });
+
+        // Category Sales Chart (Bar)
+        const ctxCategorySales = document.getElementById('categorySalesChart').getContext('2d');
+        const categorySalesChart = new Chart(ctxCategorySales, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(JsonConvert.SerializeObject(Model.CategorySalesCounts.Keys)),
+                datasets: [{
+                    label: 'Số sách đã bán',
+                    data: @Html.Raw(JsonConvert.SerializeObject(Model.CategorySalesCounts.Values)),
+                    backgroundColor: 'rgba(255, 87, 51, 0.7)', // --neon-orange
+                    borderColor: 'rgba(255, 87, 51, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        bodyFont: { size: 14, family: 'Poppins' },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                let total = context.dataset.data.reduce((a, b) => a + b, 0) || 1; // Tránh chia cho 0
+                                let percentage = ((value / total) * 100).toFixed(1) + '%';
+                                return `${label}: ${value} (${percentage})`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Số sách đã bán', font: { size: 14 } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Danh mục', font: { size: 14 } }
+                    }
+                }
+            }
+        });
+
+        // Order Status Chart (Doughnut - Thu nhỏ)
+        const ctxOrderStatus = document.getElementById('orderStatusChart').getContext('2d');
+        const orderStatusChart = new Chart(ctxOrderStatus, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(JsonConvert.SerializeObject(Model.OrderStatusStats.Select(x => x.Status))),
+                datasets: [{
+                    label: 'Trạng thái đơn hàng',
+                    data: @Html.Raw(JsonConvert.SerializeObject(Model.OrderStatusStats.Select(x => x.Count))),
+                    backgroundColor: [
+                        'rgba(255, 87, 51, 0.7)', // --neon-orange
+                        'rgba(30, 58, 138, 0.7)', // --primary-gradient start
+                        'rgba(107, 33, 168, 0.7)', // --primary-gradient end
+                        'rgba(16, 185, 129, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 87, 51, 1)',
+                        'rgba(30, 58, 138, 1)',
+                        'rgba(107, 33, 168, 1)',
+                        'rgba(16, 185, 129, 1)'
+                    ],
+                    borderWidth: 2,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 12, family: 'Poppins' } }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        bodyFont: { size: 12, family: 'Poppins' },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                let value = context.raw || 0;
+                                let total = context.dataset.data.reduce((a, b) => a + b, 0) || 1; // Tránh chia cho 0
+                                let percentage = ((value / total) * 100).toFixed(1) + '%';
+                                return `${label}: ${value} (${percentage})`;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        font: { size: 10, family: 'Poppins', weight: 'bold' },
+                        formatter: (value, context) => {
+                            let total = context.dataset.data.reduce((a, b) => a + b, 0) || 1; // Tránh chia cho 0
+                            let percentage = ((value / total) * 100).toFixed(1) + '%';
+                            return percentage;
+                        },
+                        anchor: 'center',
+                        align: 'center'
+                    }
+                },
+                cutout: '80%'
+            }
+        });
+
+        // Order Per Day Chart (Line)
+        const ctxOrderPerDay = document.getElementById('orderPerDayChart').getContext('2d');
+        const orderPerDayChart = new Chart(ctxOrderPerDay, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(JsonConvert.SerializeObject(Model.OrdersPerDay.Select(x => x.Date))),
+                datasets: [{
+                    label: 'Số đơn hàng',
+                    data: @Html.Raw(JsonConvert.SerializeObject(Model.OrdersPerDay.Select(x => x.OrderCount))),
+                    borderColor: 'rgba(30, 58, 138, 1)', // --primary-gradient start
+                    backgroundColor: 'rgba(30, 58, 138, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { size: 14, family: 'Poppins' } }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        bodyFont: { size: 14, family: 'Poppins' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Số lượng đơn hàng', font: { size: 14 } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Ngày', font: { size: 14 } }
+                    }
+                }
+            }
+        });
+
+        // Revenue Per Day Chart (Bar)
+        const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctxRevenue, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(JsonConvert.SerializeObject(Model.RevenuePerDay.Select(x => x.Date))),
+                datasets: [{
+                    label: 'Doanh thu (VND)',
+                    data: @Html.Raw(JsonConvert.SerializeObject(Model.RevenuePerDay.Select(x => x.Revenue))),
+                    backgroundColor: 'rgba(107, 33, 168, 0.7)', // --primary-gradient end
+                    borderColor: 'rgba(107, 33, 168, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top', labels: { font: { size: 14, family: 'Poppins' } } },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        bodyFont: { size: 14, family: 'Poppins' },
+                        callbacks: {
+                            label: function(context) {
+                                let value = context.raw || 0;
+                                return `Doanh thu: ${value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Doanh thu (VND)', font: { size: 14 } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Ngày', font: { size: 14 } }
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+<style>
+    .book-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: var(--shadow-neon);
+        transition: all 0.3s;
+        background: var(--light-bg);
+        position: relative;
+    }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            background: var(--card-border);
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(107, 33, 168, 0.3);
+        }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .display-5 {
+        font-size: 2.5rem;
+        line-height: 1.2;
+    }
+
+    canvas {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .fas {
+        transition: transform 0.3s ease;
+    }
+
+    .book-card:hover .fas {
+        transform: scale(1.2);
+    }
+</style>

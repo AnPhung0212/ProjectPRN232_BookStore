@@ -72,11 +72,15 @@ namespace BookStore.API.Controllers
         // PUT: api/User/5
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(int id, UserCreateDto dto)
+        public async Task<IActionResult> Update(int id, UserUpdateDto dto)
         {
-            await _userService.UpdateUserAsync(id, dto);
-            return Ok("Updated");
-        }
+            
+                var result = await _userService.UpdateUserWithPasswordAsync(id, dto);
+                if (!result.IsSuccess)
+                    return BadRequest(result.Message);
+                return Ok(result.Message);
+            }
+        
 
         // DELETE: api/User/5
         [HttpDelete("{id}")]

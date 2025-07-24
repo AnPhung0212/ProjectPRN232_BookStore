@@ -14,7 +14,7 @@ namespace BookStore.Services.Interfaces
         Task<UserDto?> AuthenticateAsync(UserLoginDto loginDto);
         Task<IEnumerable<UserDto>> GetUsersByRoleIdAsync(int roleId);
         Task AddUserAsync(UserCreateDto userDto);
-        Task UpdateUserAsync(int userId, UserCreateDto userDto);
+        Task<(bool IsSuccess, string Message)> UpdateUserWithPasswordAsync(int userId, UserUpdateDto dto);
         Task DeleteUserAsync(int id);
     }
 }

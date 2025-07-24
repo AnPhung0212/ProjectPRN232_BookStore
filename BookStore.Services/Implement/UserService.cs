@@ -48,20 +48,28 @@ namespace BookStore.Services.Implement
             await _repo.AddAsync(user);
         }
 
-        public async Task UpdateUserAsync(int userId, UserCreateDto userDto)
+        public async Task<(bool IsSuccess, string Message)> UpdateUserWithPasswordAsync(int userId, UserUpdateDto dto)
         {
-            var existing = await _repo.GetByIdAsync(userId);
-            if (existing != null)
-            {
-                existing.Username = userDto.Username;
-                existing.Password = userDto.Password;
-                existing.FullName = userDto.FullName;
-                existing.Email = userDto.Email;
-                existing.Address = userDto.Address;
-                existing.RoleId = userDto.RoleId;
+            var user = await _repo.GetByIdAsync(userId);
+            if (user == null) return (false, "User not found");
 
-                await _repo.UpdateAsync(existing);
+            if (user.Password != dto.Password)
+                return (false, "Incorrect current password");
+
+            if (!string.IsNullOrEmpty(dto.NewPassword))
+            {
+                if (dto.NewPassword != dto.ReconfirmPassword)
+                    return (false, "New password and confirmation do not match");
+
+                user.Password = dto.NewPassword;
             }
+
+            user.Username = dto.Username;
+            user.FullName = dto.FullName;
+            user.Address = dto.Address;
+
+            await _repo.UpdateAsync(user);
+            return (true, "User updated successfully");
         }
 
         public async Task DeleteUserAsync(int id)

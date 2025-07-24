@@ -10,246 +10,264 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #1E3A8A, #6B21A8);
-            --neon-orange: #FF5733;
-            --light-bg: #FFFFFF;
-            --shadow-neon: 0 0 20px rgba(107, 33, 168, 0.5);
-            --text-color: #F1F5F9;
-            --card-border: linear-gradient(135deg, #3B82F6, #A855F7);
+            --primary-gradient: linear-gradient(135deg, #2563EB, #7C3AED);
+            --accent-color: #F59E0B;
+            --background-light: #F8FAFC;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
         }
 
         body {
-            background: linear-gradient(to bottom, var(--light-bg), #E0E7FF);
-            font-family: 'Poppins', sans-serif;
-            color: #1F2937;
-            line-height: 1.6;
-            transition: padding-bottom 0.3s;
+            background: var(--background-light);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin: 0;
+            transition: all 0.3s ease;
         }
 
-        /* Notification */
+        /* Notification Bar */
         .notification-bar {
-            background: var(--neon-orange);
-            color: white;
+            background: var(--accent-color);
+            color: #FFFFFF;
             text-align: center;
-            padding: 0.5rem;
+            padding: 0.75rem;
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
         /* Navbar */
         .navbar {
             background: var(--primary-gradient);
             padding: 1rem 2rem;
-            box-shadow: var(--shadow-neon);
+            box-shadow: var(--shadow-soft);
         }
 
         .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-color) !important;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #FFFFFF !important;
         }
 
         .nav-link {
-            color: var(--text-color) !important;
-            transition: all 0.3s;
+            color: #FFFFFF !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
         }
 
             .nav-link:hover {
+                color: var(--accent-color) !important;
                 transform: translateY(-2px);
-                color: var(--neon-orange) !important;
             }
 
         .form-control {
-            border-radius: 20px;
-            border: none;
+            border-radius: 50px;
+            border: 1px solid #E2E8F0;
+            padding: 0.5rem 1rem;
+            box-shadow: none;
         }
 
         .cart-icon {
             position: relative;
-            color: var(--text-color);
+            color: #FFFFFF;
         }
 
         .cart-badge {
             position: absolute;
-            top: -5px;
-            right: -10px;
-            background: var(--neon-orange);
-            color: white;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-color);
+            color: #FFFFFF;
             border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.8rem;
+            padding: 3px 7px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
         /* Banner */
         .banner {
             background: var(--primary-gradient);
-            color: var(--text-color);
-            padding: 4rem 0;
+            color: #FFFFFF;
+            padding: 3rem 0;
+            text-align: center;
         }
 
             .banner h1 {
-                font-weight: 600;
-                font-size: 2.5rem;
+                font-size: 2.25rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
             }
 
         .btn-buy {
-            background: var(--neon-orange);
+            background: var(--accent-color);
+            color: #FFFFFF;
             border: none;
             padding: 0.75rem 2rem;
-            border-radius: 25px;
+            border-radius: 50px;
             font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: var(--shadow-neon);
+            transition: all 0.3s ease;
         }
 
             .btn-buy:hover {
-                background: #F97316;
+                background: #D97706;
                 transform: scale(1.05);
             }
 
         /* Books Section */
         .book-card {
             border: none;
-            border-radius: 15px;
+            border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: var(--shadow-neon);
-            transition: all 0.3s;
-            background: var(--light-bg);
-            position: relative;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            background: #FFFFFF;
         }
 
-            .book-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                border-radius: 15px;
-                border: 2px solid transparent;
-                background: var(--card-border);
-                -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-                -webkit-mask-composite: destination-out;
-                mask-composite: exclude;
-            }
-
             .book-card:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 15px 30px rgba(107, 33, 168, 0.3);
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
             }
 
             .book-card img {
-                height: 250px;
+                height: 200px;
                 width: 100%;
                 object-fit: cover;
             }
 
             .book-card .card-body {
-                padding: 1.5rem;
+                padding: 1.25rem;
             }
 
         .book-title {
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* Filter */
-        .filter-box {
-            background: var(--light-bg);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow-neon);
+        /* Sidebar */
+        .sidebar {
+            background: #FFFFFF;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            min-height: 500px;
         }
 
-        /* Reviews */
-        .review-card {
-            background: var(--light-bg);
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow-neon);
-        }
+            .sidebar h5 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+            }
+
+            .sidebar .nav-link {
+                color: var(--text-primary) !important;
+                font-weight: 500;
+                padding: 0.75rem 1rem;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+
+                .sidebar .nav-link:hover {
+                    background: var(--background-light);
+                    color: var(--accent-color) !important;
+                    padding-left: 1.25rem;
+                }
+
+            .sidebar i {
+                color: var(--text-primary) !important;
+                margin-right: 0.5rem;
+            }
 
         /* Footer */
         footer {
             background: var(--primary-gradient);
-            padding: 3rem 0;
-            color: var(--text-color);
+            color: #FFFFFF;
+            padding: 2rem 0;
         }
 
             footer a {
-                color: var(--text-color);
-                transition: all 0.3s;
+                color: #FFFFFF;
+                text-decoration: none;
+                transition: all 0.3s ease;
             }
 
                 footer a:hover {
-                    color: var(--neon-orange);
+                    color: var(--accent-color);
                 }
 
         /* Chatbox */
         .chatbox {
             position: fixed;
-            bottom: 80px; /* Dịch lên một chút */
+            bottom: 80px;
             right: 20px;
-            width: 300px;
-            background: var(--light-bg);
-            border-radius: 15px;
-            box-shadow: var(--shadow-neon);
+            width: 320px;
+            background: #FFFFFF;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
             overflow: hidden;
             z-index: 1000;
+            display: none;
         }
 
         .chatbox-header {
             background: var(--primary-gradient);
-            color: var(--text-color);
-            padding: 10px;
-            text-align: center;
+            color: #FFFFFF;
+            padding: 0.75rem;
             font-weight: 600;
+            text-align: center;
         }
 
         .chatbox-body {
-            padding: 10px;
-            height: 200px;
+            padding: 1rem;
+            height: 220px;
             overflow-y: auto;
+            background: #F8FAFC;
         }
 
         .chatbox-footer {
-            padding: 10px;
-            border-top: 1px solid #E5E7EB;
+            padding: 0.75rem;
+            border-top: 1px solid #E2E8F0;
             display: flex;
-            gap: 10px;
+            gap: 0.5rem;
         }
 
             .chatbox-footer input {
                 flex: 1;
-                padding: 8px;
-                border-radius: 20px;
-                border: 1px solid #D1D5DB;
+                padding: 0.5rem 1rem;
+                border-radius: 50px;
+                border: 1px solid #E2E8F0;
+                outline: none;
             }
 
             .chatbox-footer button {
-                background: var(--neon-orange);
-                color: white;
+                background: var(--accent-color);
+                color: #FFFFFF;
                 border: none;
-                padding: 8px 15px;
-                border-radius: 20px;
+                padding: 0.5rem 1rem;
+                border-radius: 50px;
+                font-weight: 500;
                 cursor: pointer;
+                transition: all 0.3s ease;
             }
 
                 .chatbox-footer button:hover {
-                    background: #F97316;
+                    background: #D97706;
                 }
 
         .chatbox-toggle {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: var(--neon-orange);
-            color: white;
+            background: var(--accent-color);
+            color: #FFFFFF;
             border: none;
             border-radius: 50%;
             width: 50px;
@@ -257,24 +275,24 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-neon);
+            box-shadow: var(--shadow-soft);
             cursor: pointer;
             z-index: 1001;
         }
 
+        /* Cart Items */
         .cart-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 1rem 0;
-            border-bottom: 1px solid #E5E7EB;
-            flex-wrap: wrap;
+            border-bottom: 1px solid #E2E8F0;
             gap: 1rem;
         }
 
         .cart-img {
-            width: 60px;
-            height: 90px;
+            width: 50px;
+            height: 75px;
             object-fit: cover;
             border-radius: 5px;
         }
@@ -285,9 +303,9 @@
         }
 
         .cart-item-title {
-            font-size: 1rem;
-            font-weight: 500;
-            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
         }
 
         .cart-item-price {
@@ -302,63 +320,51 @@
         }
 
         .btn-qty {
-            background: #FF5733;
-            color: white;
+            background: var(--accent-color);
+            color: #FFFFFF;
             border: none;
             width: 28px;
             height: 28px;
             border-radius: 50%;
             font-size: 1rem;
             cursor: pointer;
-            padding: 0;
-            line-height: 1;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
         }
 
             .btn-qty:hover {
-                background: #F97316;
+                background: #D97706;
             }
 
         .qty-input {
-            width: 45px;
+            width: 40px;
             text-align: center;
-            border: 1px solid #D1D5DB;
+            border: 1px solid #E2E8F0;
             border-radius: 5px;
             padding: 0.25rem;
-        }
-
-        .remove-item-form {
-            margin-left: 1rem;
         }
 
         .btn-delete {
             background: none;
             border: none;
             color: #EF4444;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
         }
 
             .btn-delete:hover {
                 color: #DC2626;
             }
-
     </style>
 </head>
 
 <body>
-    <!-- Notification Bar -->
-    <div class="notification-bar">
-        Miễn phí vận chuyển cho đơn hàng từ 500.000đ - Chỉ hôm nay!
-    </div>
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            @* <a class="navbar-link" href="#">Hiệu Sách An</a> *@
-            <a class="nav-link" asp-controller="Home" asp-action="Index">Hiệu Sách An</a>
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">Hiệu Sách An</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -378,15 +384,12 @@
                             }
                             <span class="cart-badge">@cartCount</span>
                         </a>
-
                     </li>
-                    @* Các option login *@
                     @{
                         var userName = Context.Session.GetString("Username");
                         var role = Context.Session.GetString("Role");
                         var userEmail = Context.Session.GetString("UserEmail");
                     }
-
                     @if (!string.IsNullOrEmpty(userName) || !string.IsNullOrEmpty(userEmail))
                     {
                         <li class="nav-item dropdown">
@@ -395,12 +398,10 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" asp-controller="User" asp-action="Index">User Profile</a></li>
-
                                 @if (role == "Admin")
                                 {
                                     <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">Admin Dashboard</a></li>
                                 }
-
                                 <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Logout</a></li>
                             </ul>
                         </li>
@@ -411,53 +412,54 @@
                             <a class="nav-link" asp-controller="Account" asp-action="Login"><i class="fas fa-user"></i></a>
                         </li>
                     }
-
-
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Banner -->
-    <div class="banner text-center">
-        <div class="container">
-            <h1>Khám Phá Thế Giới Sách</h1>
-            <p>Ưu đãi toàn bộ sách - Chỉ trong tháng này!</p>
-            <button class="btn btn-buy mt-3">Mua Ngay</button>
-        </div>
-    </div>
-   <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>Liên Hệ</h5>
-                    <p>Email: contact@hieusach.com</p>
-                    <p>Phone: 0123-456-789</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Chính Sách</h5>
-                    <a href="#">Bảo Mật</a><br>
-                    <a href="#">Điều Khoản</a>
-                </div>
-                <div class="col-md-4">
-                    <h5>Theo Dõi</h5>
-                    <a href="#" class="me-2"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <h5>Quản Trị</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                                <i class="fas fa-chart-line"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="ProductMVC" asp-action="AdminManage">
+                                <i class="fas fa-book"></i> Manage Product
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="CategoryMVC" asp-action="AdminManage">
+                                <i class="fas fa-tags"></i> Manage Category
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Order" asp-action="AdminManage">
+                                <i class="fas fa-shopping-bag"></i> Manage Order
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
+
+            <!-- Main content -->
+            <div class="col-md-9">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
         </div>
-    </footer>
+    </div>
 
     <!-- Chatbox -->
-    <div class="chatbox" id="chatbox" style="display: none;">
+    <div class="chatbox" id="chatbox">
         <div class="chatbox-header">Hỗ Trợ Trực Tuyến</div>
         <div class="chatbox-body">
             <p>Xin chào! Chúng tôi có thể giúp gì cho bạn?</p>
@@ -471,49 +473,45 @@
         <i class="fas fa-comment"></i>
     </button>
 
-
-    <!-- Custom JS -->
+    <!-- Scripts -->
     <script>
-        // Xử lý tên sách dài
         document.addEventListener('DOMContentLoaded', function () {
+            // Truncate long book titles
             const bookTitles = document.querySelectorAll('.book-title');
             bookTitles.forEach(title => {
                 const text = title.textContent.trim();
-                if (text.length > 20) {
-                    title.textContent = text.substring(0, 17) + '...';
+                if (text.length > 25) {
+                    title.textContent = text.substring(0, 22) + '...';
                 }
             });
 
-            // Xử lý toggle chatbox và dịch màn hình
+            // Toggle chatbox
             const chatbox = document.getElementById('chatbox');
             const chatToggle = document.getElementById('chatToggle');
             chatToggle.addEventListener('click', function () {
-                if (chatbox.style.display === 'none' || chatbox.style.display === '') {
-                    chatbox.style.display = 'block';
-                    document.body.style.paddingBottom = '350px'; // Dịch màn hình lên
-                } else {
-                    chatbox.style.display = 'none';
-                    document.body.style.paddingBottom = '0'; // Trả về bình thường
-                }
+                chatbox.style.display = chatbox.style.display === 'none' ? 'block' : 'none';
             });
-        });
 
-        // Hàm gửi tin nhắn (giả lập)
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (message) {
-                const chatBody = document.querySelector('.chatbox-body');
-                const newMessage = document.createElement('p');
-                newMessage.textContent = 'Bạn: ' + message;
-                chatBody.appendChild(newMessage);
-                input.value = ''; // Xóa ô nhập
-                chatBody.scrollTop = chatBody.scrollHeight; // Cuộn xuống dưới
+            // Handle sending messages
+            function sendMessage() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                if (message) {
+                    const chatBody = document.querySelector('.chatbox-body');
+                    const newMessage = document.createElement('p');
+                    newMessage.textContent = 'Bạn: ' + message;
+                    chatBody.appendChild(newMessage);
+                    input.value = '';
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                }
             }
-        }
+
+            // Expose sendMessage globally
+            window.sendMessage = sendMessage;
+        });
     </script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

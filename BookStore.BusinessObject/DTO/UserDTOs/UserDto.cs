@@ -15,5 +15,6 @@ namespace BookStore.BusinessObject.DTO.UserDTOs
         public string? Address { get; set; }
         public decimal? TotalAmount { get; set; }
         public string? RoleName { get; set; }
+        public string? PassWord { get; set; }
     }
 }
