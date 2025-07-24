@@ -11,7 +11,7 @@ namespace BookStore.Services.Interfaces
     {
         Task<IEnumerable<ProductDTO>> GetAllProductsAsync();
         Task<ProductDTO?> GetProductByIdAsync(int id);
-        Task AddProductAsync(ProductDTO product);
+        Task AddProductAsync(ProductCreateDTO product);
         Task UpdateProductAsync(UpdateProductDTO product);
         Task DeleteProductAsync(int id);
         Task<IEnumerable<ProductDTO>> SearchProductsAsync(string searchTerm);

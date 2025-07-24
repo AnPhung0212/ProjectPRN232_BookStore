@@ -50,7 +50,7 @@ namespace BookStore.Services.Implement
         }
 
 
-        public async Task AddProductAsync(ProductDTO productDto)
+        public async Task AddProductAsync(ProductCreateDTO productDto)
         {
             var product = MapToEntity(productDto);
             await _productRepo.AddProductAsync(product);
@@ -117,9 +117,8 @@ namespace BookStore.Services.Implement
             ImageUrl = p.ImageUrl
         };
 
-        private Product MapToEntity(ProductDTO dto) => new Product
+        private Product MapToEntity(ProductCreateDTO dto) => new Product
         {
-            ProductId = dto.ProductId,
             CategoryId = dto.CategoryId,
             Title = dto.Title,
             Author = dto.Author,

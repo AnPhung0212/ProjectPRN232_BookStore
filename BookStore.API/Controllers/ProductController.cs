@@ -44,13 +44,13 @@ namespace BookStore.API.Controllers
         // POST: api/Product
         [HttpPost]
         [Authorize(Roles = "Admin")] // Nếu bạn dùng role
-        public async Task<IActionResult> CreateProduct([FromBody] ProductDTO dto)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             await _productService.AddProductAsync(dto);
-            return CreatedAtAction(nameof(GetProductById), new { id = dto.ProductId }, dto);
+            return Ok();
         }
 
         // PUT: api/Product/{id}

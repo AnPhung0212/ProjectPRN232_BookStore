@@ -1,0 +1,50 @@
+﻿@model BookStore.MVC.ViewModels.ProductCreateViewModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="ProductEdit.ProductId" />
+
+    <div class="mb-3">
+        <label asp-for="ProductEdit.Title" class="form-label"></label>
+        <input asp-for="ProductEdit.Title" class="form-control" />
+        <span asp-validation-for="ProductEdit.Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ProductEdit.Description" class="form-label"></label>
+        <textarea asp-for="ProductEdit.Description" class="form-control"></textarea>
+        <span asp-validation-for="ProductEdit.Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ProductEdit.Price" class="form-label"></label>
+        <input asp-for="ProductEdit.Price" class="form-control" />
+        <span asp-validation-for="ProductEdit.Price" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ProductEdit.Stock" class="form-label"></label>
+        <input asp-for="ProductEdit.Stock" class="form-control" />
+        <span asp-validation-for="ProductEdit.Stock" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ProductEdit.CategoryId" class="form-label"></label>
+        <select asp-for="ProductEdit.CategoryId" class="form-select" asp-items="@(new SelectList(Model.Categories, "CategoryId", "CategoryName"))">
+            <option value="">-- Chọn danh mục --</option>
+        </select>
+        <span asp-validation-for="ProductEdit.CategoryId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

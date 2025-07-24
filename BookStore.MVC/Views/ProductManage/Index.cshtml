@@ -1,0 +1,46 @@
+﻿@model List<BookStore.BusinessObject.DTO.ProductDTO>
+@{
+    Layout = "_LayoutAdmin";
+}
+<h2>Quản lý sản phẩm</h2>
+<a href="/ProductManage/Create" class="btn btn-success mb-3">Thêm sản phẩm</a>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Tiêu đề</th>
+            <th>Ảnh</th>
+            <th>Tác giả</th>
+            <th>Giá</th>
+            <th>Tồn kho</th>
+            <th>Danh mục</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.Title</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(p.ImageUrl))
+                    {
+                        <img src="~/images/@p.ImageUrl" alt="Ảnh" width="60" height="80" />
+                    }
+                    else
+                    {
+                        <img src="~/images/noimage.PNG" alt="Ảnh" width="60" height="80" />
+                    }
+                <td>@p.Author</td>
+                <td>@p.Price</td>
+                <td>@p.Stock</td>
+                <td>@p.CategoryName</td>
+                <td>
+                    <a href="/ProductManage/Edit/@p.ProductId" class="btn btn-primary btn-sm">Sửa</a>
+                    <a href="/ProductManage/Delete/@p.ProductId" class="btn btn-danger btn-sm" onclick="return confirm('Xóa sản phẩm này?')">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

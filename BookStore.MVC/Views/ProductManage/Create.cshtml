@@ -1,0 +1,73 @@
+﻿@model BookStore.MVC.ViewModels.ProductCreateViewModel
+
+@{
+    ViewData["Title"] = "Thêm sản phẩm";
+    Layout = "_LayoutAdmin";
+}
+
+<h2>Thêm Sản Phẩm</h2>
+
+<form asp-action="Create" method="post">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="form-group">
+        <label asp-for="Product.Title"></label>
+        <input asp-for="Product.Title" class="form-control" />
+        <span asp-validation-for="Product.Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Product.Author"></label>
+        <input asp-for="Product.Author" class="form-control" />
+        <span asp-validation-for="Product.Author" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Product.Price"></label>
+        <input asp-for="Product.Price" class="form-control" />
+        <span asp-validation-for="Product.Price" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Product.Description"></label>
+        <input asp-for="Product.Description" class="form-control" />
+        <span asp-validation-for="Product.Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Product.Stock"></label>
+        <input asp-for="Product.Stock" class="form-control" />
+        <span asp-validation-for="Product.Stock" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Product.ImageUrl"></label>
+        <input asp-for="Product.ImageUrl" class="form-control" />
+        <span asp-validation-for="Product.ImageUrl" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Product.CategoryId">Danh mục</label>
+        <select asp-for="Product.CategoryId" asp-items="@(new SelectList(Model.Categories, "CategoryId", "CategoryName"))" class="form-control">
+            <option value="">-- Chọn danh mục --</option>
+        </select>
+        <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Tạo</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
