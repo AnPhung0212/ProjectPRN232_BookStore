@@ -88,6 +88,15 @@ namespace BookStore.Services.Implement
             var orders = await _repo.GetOrdersByUserIdAsync(userId);
             return orders.Select(MapToDto);
         }
+        public async Task<bool> UpdateStatusAsync(int orderId, int statusId)
+        {
+            var order = await _repo.GetByIdAsync(orderId);
+            if (order == null) return false;
+
+            order.StatusId = statusId;
+            await _repo.UpdateAsync(order);
+            return true;
+        }
 
 
         private OrderDTO MapToDto(Order o) => new OrderDTO

@@ -21,7 +21,12 @@ namespace BookStore.API.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll() => Ok(await _service.GetAllAsync());
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetAll()
+        {
+            var orders = await _service.GetAllAsync();
+            return Ok(orders);
+        }
+
 
         [HttpGet("{id}")]
         [Authorize]
@@ -61,6 +66,16 @@ namespace BookStore.API.Controllers
         {
             var orders = await _service.GetOrdersByUserIdAsync(userId);
             return Ok(orders);
+        }
+        [HttpPut("updatestatus/{orderId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateStatus(int orderId, [FromBody] int statusId)
+        {
+            var success = await _service.UpdateStatusAsync(orderId, statusId);
+            if (!success)
+                return NotFound("Không tìm thấy đơn hàng.");
+
+            return Ok("Cập nhật trạng thái thành công.");
         }
 
     }

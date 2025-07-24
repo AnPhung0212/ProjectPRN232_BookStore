@@ -14,6 +14,6 @@ namespace BookStore.Services.Interfaces
         Task<int> CreateAsync(OrderCreateDTO dto);
         Task DeleteAsync(int id);
         Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(int userId);
-
+        Task<bool> UpdateStatusAsync(int orderId, int statusId);
     }
 }

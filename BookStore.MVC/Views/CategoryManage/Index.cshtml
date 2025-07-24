@@ -1,0 +1,32 @@
+﻿@model List<BookStore.BusinessObject.DTO.CategoryDTO>
+@{
+    ViewData["Title"] = "Quản lý danh mục";
+}
+
+<h2>Quản lý danh mục</h2>
+
+<a class="btn btn-success mb-3" href="/CategoryManage/Create">Thêm danh mục</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên danh mục</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.CategoryId</td>
+                <td>@c.CategoryName</td>
+                <td>
+                    <a href="/CategoryManage/Edit/@c.CategoryId" class="btn btn-sm btn-primary">Sửa</a>
+                    <a href="/CategoryManage/Delete/@c.CategoryId" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Bạn có chắc muốn xóa?');">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

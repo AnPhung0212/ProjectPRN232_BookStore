@@ -1,0 +1,70 @@
+﻿@model List<BookStore.BusinessObject.DTO.DtoForOrder.OrderDTO>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<h2>Quản lý đơn hàng</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Người dùng</th>
+            <th>Ngày tạo</th>
+            <th>Trạng thái</th>
+            <th>Cập nhật trạng thái</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.OrderId</td>
+                <td>@order.UserId</td>
+                <td>@order.OrderDate?.ToString("dd/MM/yyyy")</td>
+                <td>
+
+                    @{
+                        var status = order.StatusId switch
+                        {
+                            1 => "Đang xử lý",
+                            2 => "Đang giao",
+                            3 => "Hoàn tất",
+                            4 => "Hủy",
+                            _ => "Không xác định"
+                        };
+                    }
+                    @status
+                </td>
+                <td>
+                    @if (order.StatusId == 3 || order.StatusId == 4)
+                    {
+                        <span class="text-muted">Không thể cập nhật</span>
+                    }
+                    else
+                    {
+                        <form asp-action="UpdateStatus" asp-controller="OrderManage" method="post" style="display:flex;">
+                            <input type="hidden" name="orderId" value="@order.OrderId" />
+                            <select name="statusId" class="form-select form-select-sm">
+                                <option value="1" selected="@(order.StatusId == 1 ? "selected" : null)">Đang xử lý</option>
+                                <option value="2" selected="@(order.StatusId == 2 ? "selected" : null)">Đang giao</option>
+                                <option value="3">Hoàn tất</option>
+                                <option value="4">Hủy</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm ms-1">Cập nhật</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
