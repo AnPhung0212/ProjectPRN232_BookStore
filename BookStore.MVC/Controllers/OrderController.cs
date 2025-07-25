@@ -3,6 +3,7 @@ using BookStore.BusinessObject.DTO.DtoForOrder;
 using BookStore.BusinessObject.DTO.UserDTOs;
 using BookStore.BusinessObject.Models;
 using BookStore.MVC.Helpers;
+using BookStore.MVC.Library;
 using BookStore.MVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -11,6 +12,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using VNPAY.NET.Models;
 
 namespace BookStore.MVC.Controllers
 {
@@ -26,42 +28,30 @@ namespace BookStore.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Checkout(string ShippingAddress, string PhoneNumber, string PaymentMethod)
         {
-            // Kiểm tra login
             var token = HttpContext.Session.GetString("JWToken");
             var userEmail = HttpContext.Session.GetString("UserEmail");
             var userIdStr = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userIdStr)) // thêm log
-            {
-                Console.WriteLine("Không tìm thấy UserId trong session");
-            }
 
-            if (string.IsNullOrWhiteSpace(ShippingAddress) ||string.IsNullOrWhiteSpace(PhoneNumber) ||string.IsNullOrWhiteSpace(PaymentMethod))
+            if (string.IsNullOrWhiteSpace(ShippingAddress) || string.IsNullOrWhiteSpace(PhoneNumber) || string.IsNullOrWhiteSpace(PaymentMethod))
             {
                 TempData["Error"] = "Vui lòng điền đầy đủ thông tin giao hàng và chọn phương thức thanh toán.";
                 return RedirectToAction("ViewCart", "Cart");
             }
+
             if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userIdStr))
             {
-                // Chưa login → chuyển hướng đến Login
                 return RedirectToAction("Login", "Account");
             }
 
-            if (PaymentMethod == "BankTransfer")
-            {
-                TempData["Error"] = "Chức năng chuyển khoản ngân hàng chưa được hỗ trợ.";
-                return RedirectToAction("ViewCart", "Cart");
-            }
-
-            // Lấy cart từ session
             var cart = HttpContext.Session.GetObjectFromJson<CartDTOForSession>("CART_SESSION");
             if (cart == null || !cart.Items.Any())
             {
                 TempData["Error"] = "Giỏ hàng của bạn đang trống.";
                 return RedirectToAction("ViewCart", "Cart");
             }
+
             int userId = int.Parse(userIdStr);
 
-            // Tạo OrderCreateDTO
             var orderDto = new OrderCreateDTO
             {
                 UserId = userId,
@@ -76,11 +66,28 @@ namespace BookStore.MVC.Controllers
                 }).ToList()
             };
 
-            // Gọi API để lấy UserId theo email
+            if (PaymentMethod == "VNPAY")
+            {
+                // Chuyển sang VNPAY mà chưa tạo đơn hàng
+                var totalAmount = cart.Items.Sum(i => i.Quantity * (i.UnitPrice ?? 0)) + 30000; // shipping fee
+                HttpContext.Session.SetObjectAsJson("PENDING_ORDER", orderDto); // Lưu tạm OrderCreateDTO vào session
+
+                var paymentRequest = new PaymentRequest
+                {
+                    PaymentId = 0, // chưa có ID, sẽ gán sau khi thanh toán thành công
+                    Money =(double)totalAmount
+                };
+
+                var vnpayService = new VnpayService(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build());
+                string paymentUrl = vnpayService.GetPaymentUrl(paymentRequest);
+
+                return Redirect(paymentUrl);
+            }
+
+            // Nếu là Cash thì tạo đơn hàng luôn
             var client = _clientFactory.CreateClient("BookStoreApi");
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            // Gửi order lên API
             var orderResponse = await client.PostAsJsonAsync("orders/create", orderDto);
             if (!orderResponse.IsSuccessStatusCode)
             {
@@ -88,13 +95,9 @@ namespace BookStore.MVC.Controllers
                 return RedirectToAction("ViewCart", "Cart");
             }
 
-            // Đọc orderId từ phản hồi
             int orderId = await orderResponse.Content.ReadFromJsonAsync<int>();
-
-            // Xóa giỏ hàng sau khi đặt hàng thành công
             HttpContext.Session.Remove("CART_SESSION");
 
-            // Chuyển đến trang hiển thị hóa đơn
             TempData["Success"] = "Đặt hàng thành công!";
             return RedirectToAction("Invoice", new { id = orderId });
         }
@@ -167,5 +170,47 @@ namespace BookStore.MVC.Controllers
                 return View(new List<OrderDTO>());
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> PaymentReturn()
+        {
+            var vnpayService = new VnpayService(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build());
+
+            var response = vnpayService.GetPaymentResult(Request.Query);
+            if (!response.IsSuccess)
+            {
+                TempData["Error"] = "Thanh toán thất bại hoặc bị hủy.";
+                return RedirectToAction("ViewCart", "Cart");
+            }
+
+            // Nếu thanh toán thành công, có thể cập nhật trạng thái đơn hàng ở đây
+            var orderDto = HttpContext.Session.GetObjectFromJson<OrderCreateDTO>("PENDING_ORDER");
+            if (orderDto == null)
+            {
+                TempData["Error"] = "Không tìm thấy thông tin đơn hàng.";
+                return RedirectToAction("ViewCart", "Cart");
+            }
+
+            var token = HttpContext.Session.GetString("JWToken");
+            var client = _clientFactory.CreateClient("BookStoreApi");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // ✅ Gửi đơn hàng lên API
+            var orderResponse = await client.PostAsJsonAsync("orders/create", orderDto);
+            if (!orderResponse.IsSuccessStatusCode)
+            {
+                TempData["Error"] = "Tạo đơn hàng thất bại sau khi thanh toán.";
+                return RedirectToAction("ViewCart", "Cart");
+            }
+
+            int orderId = await orderResponse.Content.ReadFromJsonAsync<int>();
+
+            // ✅ Dọn session
+            HttpContext.Session.Remove("CART_SESSION");
+            HttpContext.Session.Remove("PENDING_ORDER");
+
+            TempData["Success"] = "Thanh toán và đặt hàng thành công!";
+            return RedirectToAction("Invoice", new { id = orderId });
+        }
+
     }
 }

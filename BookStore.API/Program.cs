@@ -14,6 +14,7 @@ using BookStore.DataAccessObject.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+//Connect VNPay API
 
 // Read JWT configuration from appsettings.json
 var configuration = builder.Configuration;
@@ -40,6 +41,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });
+builder.Services.AddHttpContextAccessor();
 
 // Dependency Injection
 builder.Services.AddScoped<ProductDAO>();
