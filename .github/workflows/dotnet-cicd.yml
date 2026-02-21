@@ -1,38 +1,76 @@
-﻿# Tên của quy trình (workflow) sẽ hiển thị trên tab Actions của GitHub
-name: .NET Build and Test
+﻿name: .NET Build and Deploy
 
-# Định nghĩa sự kiện kích hoạt workflow
 on:
   push:
-    branches: [ "main" ] # Chạy khi có code push lên nhánh main
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ] # Chạy khi có Pull Request nhắm vào nhánh main
+    branches: [ "main" ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  # Đường dẫn đến thư mục chứa project
+  PATH_TO_MVC_PROJECT: './BookStore.MVC' 
+  PATH_TO_API_PROJECT: './BookStore.API'
 
 jobs:
   build:
-    # Sử dụng máy ảo Ubuntu phiên bản mới nhất để chạy
     runs-on: ubuntu-latest
 
     steps:
-    # Bước 1: Sao chép (checkout) source code từ repository về máy ảo
     - uses: actions/checkout@v4
 
-    # Bước 2: Cài đặt môi trường .NET SDK
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x # Sử dụng phiên bản .NET 8
+        dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    # Bước 3: Khôi phục các thư viện (NuGet packages)
     - name: Restore dependencies
       run: dotnet restore
 
-    # Bước 4: Biên dịch (Build) ứng dụng ở chế độ Release
-    # --no-restore: Không cần restore lại vì đã làm ở bước trên
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build --configuration Release --no-restore
 
-    # Bước 5: Chạy các bài kiểm thử (Unit Tests) nếu có
-    # --no-build: Tận dụng kết quả build ở bước trên để tiết kiệm thời gian
-    - name: Test
-      run: dotnet test --no-build --configuration Release --verbosity normal
+    # Nếu chưa có project Test thì comment dòng này lại để tránh lỗi
+    # - name: Test
+    #   run: dotnet test --configuration Release --no-build --verbosity normal
+
+    - name: Publish MVC
+      run: dotnet publish ${{ env.PATH_TO_MVC_PROJECT }} -c Release -o ./publish/mvc
+
+    - name: Publish API
+      run: dotnet publish ${{ env.PATH_TO_API_PROJECT }} -c Release -o ./publish/api
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: deploy-artifacts
+        path: ./publish
+
+  deploy:
+    # Chỉ chạy deploy khi code được push vào nhánh main (không chạy khi Pull Request)
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: build # Phải đợi build xong mới chạy
+    
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: deploy-artifacts
+        path: ./publish
+
+    # Deploy lên Azure Web App MVC
+    - name: Deploy MVC to Azure
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'bookstore-mvc-anpk' 
+        package: './publish/mvc'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_MVC }}
+
+    # Deploy lên Azure Web App API
+    - name: Deploy API to Azure
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'bookstore-api-anpk'
+        package: './publish/api'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_API }}
