@@ -43,6 +43,17 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddHttpContextAccessor();
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 // Dependency Injection
 builder.Services.AddScoped<ProductDAO>();
 builder.Services.AddScoped<CartDAO>();
@@ -100,13 +111,17 @@ builder.Services.AddSwaggerGen(option =>
 var app = builder.Build();
 
 // Middleware pipeline
-if (app.Environment.IsDevelopment())
+// Cho phép chạy Swagger ở mọi môi trường (hoặc xóa if check)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "BookStore API V1");
+    c.RoutePrefix = "swagger"; // Đảm bảo đường dẫn là /swagger
+});
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 app.UseAuthentication(); // Bắt buộc nếu dùng JWT
 app.UseAuthorization();
