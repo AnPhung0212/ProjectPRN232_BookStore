@@ -12,9 +12,9 @@ namespace BookStore.Services.Implement
 {
     public class CategoryService : ICategoryService
     {
-        private readonly ICategoryRepository _categoryRepo;
+        private readonly IGenericRepository<Category> _categoryRepo;
 
-        public CategoryService(ICategoryRepository categoryRepo)
+        public CategoryService(IGenericRepository<Category> categoryRepo)
         {
             _categoryRepo = categoryRepo;
         }

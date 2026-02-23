@@ -2,6 +2,7 @@
 using BookStore.BusinessObject.Models;
 using BookStore.DataAccessObject.IRepository;
 using BookStore.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,53 +13,37 @@ namespace BookStore.Services.Implement
 {
     public class ProductService : IProductService
     {
-        private readonly IProductRepository _productRepo;
+        private readonly IGenericRepository<Product> _productRepo;
 
-        public ProductService(IProductRepository productRepo)
+        public ProductService(IGenericRepository<Product> productRepo)
         {
             _productRepo = productRepo;
         }
+
         public async Task<IEnumerable<ProductDTO>> GetAllProductsAsync()
         {
-            var products = await _productRepo.GetAllProductsAsync();
+            var products = await _productRepo.Entities.Include(p => p.Category).ToListAsync();
             return products.Select(p => MapToDTO(p));
         }
 
-        /*        public async Task<ProductDTO?> GetProductByIdAsync(int id)
-                {
-                    var product = await _productRepo.GetProductByIdAsync(id);
-                    return product == null ? null : MapToDTO(product);
-                }*/
         public async Task<ProductDTO?> GetProductByIdAsync(int id)
         {
-            var product = await _productRepo.GetProductByIdAsync(id);
+            var product = await _productRepo.Entities.Include(p => p.Category).FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (product == null) return null;
 
-            return new ProductDTO
-            {
-                ProductId = product.ProductId,
-                CategoryId = product.CategoryId,
-                Title = product.Title,
-                Author = product.Author,
-                Price = product.Price,
-                Description = product.Description,
-                Stock = product.Stock,
-                ImageUrl = product.ImageUrl,
-                CategoryName = product.Category?.CategoryName  // ✅ thêm dòng này
-            };
+            return MapToDTO(product);
         }
-
 
         public async Task AddProductAsync(ProductCreateDTO productDto)
         {
             var product = MapToEntity(productDto);
-            await _productRepo.AddProductAsync(product);
+            await _productRepo.AddAsync(product);
         }
 
         public async Task UpdateProductAsync(UpdateProductDTO dto)
         {
-            var existingProduct = await _productRepo.GetProductByIdAsync(dto.ProductId);
+            var existingProduct = await _productRepo.GetByIdAsync(dto.ProductId);
             if (existingProduct == null)
             {
                 throw new Exception("Product not found");
@@ -84,23 +69,30 @@ namespace BookStore.Services.Implement
 
             if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
                 existingProduct.ImageUrl = dto.ImageUrl;
-            await _productRepo.UpdateProductAsync(existingProduct);
-
+            
+            await _productRepo.UpdateAsync(existingProduct);
         }
 
         public async Task DeleteProductAsync(int id)
         {
-            await _productRepo.DeleteProductAsync(id);
+            await _productRepo.DeleteAsync(id);
         }
 
         public async Task<IEnumerable<ProductDTO>> SearchProductsAsync(string searchTerm)
         {
-            var products = await _productRepo.SearchProductsAsync(searchTerm);
+            var products = await _productRepo.Entities
+                .Include(p => p.Category)
+                .Where(p => p.Title.Contains(searchTerm) || p.Author.Contains(searchTerm))
+                .ToListAsync();
             return products.Select(p => MapToDTO(p));
         }
+
         public async Task<IEnumerable<ProductDTO>> GetProductsByCategoryAsync(int categoryId)
         {
-            var products = await _productRepo.GetProductByCategoryIdAsync(categoryId);
+            var products = await _productRepo.Entities
+                .Include(p => p.Category)
+                .Where(p => p.CategoryId == categoryId)
+                .ToListAsync();
             return products.Select(p => MapToDTO(p));
         }
 
@@ -114,7 +106,8 @@ namespace BookStore.Services.Implement
             Price = p.Price,
             Description = p.Description,
             Stock = p.Stock,
-            ImageUrl = p.ImageUrl
+            ImageUrl = p.ImageUrl,
+            CategoryName = p.Category?.CategoryName
         };
 
         private Product MapToEntity(ProductCreateDTO dto) => new Product
