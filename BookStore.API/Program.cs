@@ -80,7 +80,15 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddControllers();
 // Đăng ký DbContext
 builder.Services.AddDbContext<BookStoreDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 10,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        }));
 
 // Swagger with JWT Authorization
 builder.Services.AddEndpointsApiExplorer();
@@ -96,6 +104,7 @@ builder.Services.AddSwaggerGen(option =>
         Type = SecuritySchemeType.Http,
         Scheme = "Bearer",
         BearerFormat = "JWT"
+
     });
 
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -112,6 +121,11 @@ builder.Services.AddSwaggerGen(option =>
             new string[] {}
         }
     });
+
+    // Thêm đoạn này để Swagger đọc được comment XML
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+    option.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
