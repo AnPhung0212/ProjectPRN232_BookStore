@@ -17,7 +17,9 @@ namespace BookStore.API.Controllers
             _categoryService = categoryService;
         }
 
-        // GET: api/Category
+        /// <summary>
+        /// Lấy tất cả danh mục sản phẩm trong hệ thống
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAll()
         {
@@ -25,7 +27,9 @@ namespace BookStore.API.Controllers
             return Ok(categories);
         }
 
-        // GET: api/Category/{id}
+        /// <summary>
+        /// Lấy thông tin chi tiết một danh mục theo ID
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryDTO>> GetById(int id)
         {
@@ -36,7 +40,9 @@ namespace BookStore.API.Controllers
             return Ok(category);
         }
 
-        // POST: api/Category
+        /// <summary>
+        /// Tạo mới một danh mục sản phẩm (Admin only)
+        /// </summary>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CategoryDTO dto)
@@ -48,7 +54,9 @@ namespace BookStore.API.Controllers
             return Ok(new { message = "Category created successfully" });
         }
 
-        // PUT: api/Category/{id}
+        /// <summary>
+        /// Cập nhật thông tin của danh mục đã có (Admin only)
+        /// </summary>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] CategoryDTO dto)
@@ -67,7 +75,9 @@ namespace BookStore.API.Controllers
             }
         }
 
-        // DELETE: api/Category/{id}
+        /// <summary>
+        /// Xóa danh mục sản phẩm khỏi hệ thống (Admin only)
+        /// </summary>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)

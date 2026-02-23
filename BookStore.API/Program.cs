@@ -12,6 +12,7 @@ using BookStore.DataAccessObject.DAO;
 using BookStore.DataAccessObject.IRepository;
 using BookStore.DataAccessObject.Repository;
 using Microsoft.EntityFrameworkCore;
+using BookStore.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 //Connect VNPay API
@@ -22,6 +23,11 @@ var jwtIssuer = configuration["JwtSettings:Issuer"];
 var jwtAudience = configuration["JwtSettings:Audience"];
 var jwtKey = configuration["JwtSettings:Key"];
 
+if (string.IsNullOrEmpty(jwtKey))
+{
+    // Log lỗi hoặc quăng exception nếu thiếu key
+    throw new InvalidOperationException("JWT Key is missing from configuration.");
+}
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -122,6 +128,8 @@ app.UseSwaggerUI(c =>
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+app.UseMiddleware<AuthorizationMiddleware>();
 
 app.UseAuthentication(); // Bắt buộc nếu dùng JWT
 app.UseAuthorization();

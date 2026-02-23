@@ -20,7 +20,6 @@ namespace BookStore.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> GetAll()
         {
             var orders = await _service.GetAllAsync();
@@ -29,7 +28,6 @@ namespace BookStore.API.Controllers
 
 
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             var order = await _service.GetByIdAsync(id);

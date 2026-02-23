@@ -22,7 +22,9 @@ namespace BookStore.API.Controllers
             _configuration = configuration;
         }
 
-        // POST: api/User/login
+        /// <summary>
+        /// Đăng nhập vào hệ thống và nhận mã Token JWT
+        /// </summary>
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginDto loginDto)
         {
@@ -33,7 +35,9 @@ namespace BookStore.API.Controllers
             return Ok(new { token, user });
         }
 
-        // POST: api/User/register
+        /// <summary>
+        /// Đăng ký tài khoản người dùng mới
+        /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserCreateDto dto)
         {
@@ -41,7 +45,9 @@ namespace BookStore.API.Controllers
             return Ok("User created");
         }
 
-        // GET: api/User
+        /// <summary>
+        /// Lấy danh sách toàn bộ người dùng trong hệ thống (Admin only)
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
@@ -50,9 +56,10 @@ namespace BookStore.API.Controllers
             return Ok(users);
         }
 
-        // GET: api/User/5
+        /// <summary>
+        /// Lấy thông tin chi tiết của một người dùng theo ID
+        /// </summary>
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -60,7 +67,9 @@ namespace BookStore.API.Controllers
             return Ok(user);
         }
 
-        // GET: api/User/role/2
+        /// <summary>
+        /// Lấy danh sách người dùng dựa theo mã vai trò (Admin only)
+        /// </summary>
         [HttpGet("role/{roleId}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetByRole(int roleId)
@@ -69,9 +78,10 @@ namespace BookStore.API.Controllers
             return Ok(users);
         }
 
-        // PUT: api/User/5
+        /// <summary>
+        /// Cập nhật thông tin tài khoản người dùng
+        /// </summary>
         [HttpPut("{id}")]
-        [Authorize]
         public async Task<IActionResult> Update(int id, UserUpdateDto dto)
         {
             
@@ -82,7 +92,9 @@ namespace BookStore.API.Controllers
             }
         
 
-        // DELETE: api/User/5
+        /// <summary>
+        /// Xóa tài khoản người dùng khỏi hệ thống (Admin only)
+        /// </summary>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
