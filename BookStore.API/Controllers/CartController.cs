@@ -1,6 +1,5 @@
 ﻿using BookStore.BusinessObject.DTO;
 using BookStore.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -9,7 +8,6 @@ namespace BookStore.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Bắt buộc phải đăng nhập để thao tác giỏ hàng
 
     public class CartController : ControllerBase
     {
@@ -20,7 +18,9 @@ namespace BookStore.API.Controllers
             _cartService = cartService;
         }
 
-        // GET: api/Cart
+        /// <summary>
+        /// Lấy thông tin giỏ hàng của người dùng hiện tại
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<CartDTO>> GetCart()
         {
@@ -31,7 +31,9 @@ namespace BookStore.API.Controllers
             return cart == null ? NotFound() : Ok(cart);
         }
 
-        // GET: api/Cart/items
+        /// <summary>
+        /// Lấy danh sách các sản phẩm trong giỏ hàng
+        /// </summary>
         [HttpGet("items")]
         public async Task<ActionResult<List<CartItemDTO>>> GetCartItems()
         {
@@ -45,7 +47,9 @@ namespace BookStore.API.Controllers
             return Ok(items);
         }
 
-        // POST: api/Cart/add
+        /// <summary>
+        /// Thêm sản phẩm vào giỏ hàng
+        /// </summary>
         [HttpPost("add")]
         public async Task<IActionResult> AddItem([FromBody] AddToCartRequest request)
         {
@@ -56,7 +60,9 @@ namespace BookStore.API.Controllers
             return Ok(new { message = "Item added to cart" });
         }
 
-        // PUT: api/Cart/update
+        /// <summary>
+        /// Cập nhật số lượng của một sản phẩm trong giỏ hàng
+        /// </summary>
         [HttpPut("update")]
         public async Task<IActionResult> UpdateQuantity([FromBody] UpdateCartQuantityRequest request)
         {
@@ -64,7 +70,9 @@ namespace BookStore.API.Controllers
             return Ok(new { message = "Quantity updated" });
         }
 
-        // DELETE: api/Cart/item/5
+        /// <summary>
+        /// Xóa một sản phẩm khỏi giỏ hàng
+        /// </summary>
         [HttpDelete("item/{cartItemId}")]
         public async Task<IActionResult> DeleteItem(int cartItemId)
         {
@@ -72,7 +80,9 @@ namespace BookStore.API.Controllers
             return Ok(new { message = "Item removed from cart" });
         }
 
-        // DELETE: api/Cart/clear
+        /// <summary>
+        /// Xóa toàn bộ sản phẩm trong giỏ hàng
+        /// </summary>
         [HttpDelete("clear")]
         public async Task<IActionResult> ClearCart()
         {

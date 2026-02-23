@@ -1,8 +1,8 @@
 ﻿using BookStore.BusinessObject.DTO;
 using BookStore.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookStore.API.Controllers
 {
@@ -17,20 +17,28 @@ namespace BookStore.API.Controllers
             _productService = productService;
         }
 
-        // GET: api/Product
+        /// <summary>
+        /// Lấy tất cả danh sách các sản phẩm đang có
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts()
         {
             var products = await _productService.GetAllProductsAsync();
             return Ok(products);
         }
+
+        /// <summary>
+        /// Lấy danh sách sản phẩm dựa trên CategoryID
+        /// </summary>
         [HttpGet("category/{categoryId}")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetByCategory(int categoryId)
         {
             var products = await _productService.GetProductsByCategoryAsync(categoryId);
             return Ok(products);
         }
-        // GET: api/Product/{id}
+        /// <summary>
+        /// Lấy thông tin chi tiết của sản phẩm theo ID
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
@@ -41,9 +49,11 @@ namespace BookStore.API.Controllers
             return Ok(product);
         }
 
-        // POST: api/Product
+        /// <summary>
+        /// Tạo một sản phẩm mới (Admin only)
+        /// </summary>
         [HttpPost]
-        [Authorize(Roles = "Admin")] // Nếu bạn dùng role
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductCreateDTO dto)
         {
             if (!ModelState.IsValid)
@@ -53,7 +63,9 @@ namespace BookStore.API.Controllers
             return Ok();
         }
 
-        // PUT: api/Product/{id}
+        /// <summary>
+        /// Cập nhật thông tin chi tiết một sản phẩm (Admin only)
+        /// </summary>
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO dto)
@@ -72,7 +84,9 @@ namespace BookStore.API.Controllers
             }
         }
 
-        // DELETE: api/Product/{id}
+        /// <summary>
+        /// Xóa sản phẩm khỏi hệ thống (Admin only)
+        /// </summary>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteProduct(int id)
@@ -81,7 +95,9 @@ namespace BookStore.API.Controllers
             return NoContent();
         }
 
-        // GET: api/Product/search?term=abc
+        /// <summary>
+        /// Tìm kiếm sản phẩm theo tên hoặc từ khóa
+        /// </summary>
         [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> Search(string term)
         {
