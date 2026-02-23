@@ -2,6 +2,7 @@
 using BookStore.BusinessObject.Models;
 using BookStore.DataAccessObject.IRepository;
 using BookStore.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,33 +13,33 @@ namespace BookStore.Services.Implement
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _repo;
+        private readonly IGenericRepository<User> _repo;
 
-        public UserService(IUserRepository repo)
+        public UserService(IGenericRepository<User> repo)
         {
             _repo = repo;
         }
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
         {
-            var users = await _repo.GetAllAsync();
+            var users = await _repo.Entities.Include(u => u.Role).ToListAsync();
             return users.Select(ToDto);
         }
 
         public async Task<UserDto?> GetUserByIdAsync(int id)
         {
-            var user = await _repo.GetByIdAsync(id);
+            var user = await _repo.Entities.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == id);
             return user != null ? ToDto(user) : null;
         }
 
         public async Task<UserDto?> AuthenticateAsync(UserLoginDto loginDto)
         {
-            var user = await _repo.GetByEmailPasswordAsync(loginDto.Email, loginDto.Password);
+            var user = await _repo.Entities.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == loginDto.Email && u.Password == loginDto.Password);
             return user != null ? ToDto(user) : null;
         }
 
         public async Task<IEnumerable<UserDto>> GetUsersByRoleIdAsync(int roleId)
         {
-            var users = await _repo.GetUsersByRoleIdAsync(roleId);
+            var users = await _repo.Entities.Include(u => u.Role).Where(u => u.RoleId == roleId).ToListAsync();
             return users.Select(ToDto);
         }
 
@@ -103,5 +104,5 @@ namespace BookStore.Services.Implement
                 CreatedAt = DateTime.UtcNow
             };
         }
-        }
+    }
 }

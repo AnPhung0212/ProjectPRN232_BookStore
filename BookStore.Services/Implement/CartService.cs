@@ -2,6 +2,7 @@
 using BookStore.BusinessObject.Models;
 using BookStore.DataAccessObject.IRepository;
 using BookStore.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,22 +13,31 @@ namespace BookStore.Services.Implement
 {
     public class CartService : ICartService
     {
-        private readonly ICartRepository _repository;
+        private readonly IGenericRepository<Cart> _cartRepo;
+        private readonly IGenericRepository<CartItem> _cartItemRepo;
 
-        public CartService(ICartRepository repository)
+        public CartService(IGenericRepository<Cart> cartRepo, IGenericRepository<CartItem> cartItemRepo)
         {
-            _repository = repository;
+            _cartRepo = cartRepo;
+            _cartItemRepo = cartItemRepo;
         }
 
         public async Task<CartDTO?> GetCartByUserIdAsync(int userId)
         {
-            var cart = await _repository.GetCartByUserIdAsync(userId);
+            var cart = await _cartRepo.Entities
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
             return cart == null ? null : ToDto(cart);
         }
 
         public async Task<List<CartItemDTO>> GetCartItemsAsync(int cartId)
         {
-            var items = await _repository.GetCartItemsAsync(cartId);
+            var items = await _cartItemRepo.Entities
+                .Include(ci => ci.Product)
+                .Where(ci => ci.CartId == cartId)
+                .ToListAsync();
+
             return items.Select(ci => new CartItemDTO
             {
                 CartItemId = ci.CartItemId,
@@ -42,13 +52,18 @@ namespace BookStore.Services.Implement
 
         public async Task AddCartItemAsync(int userId, int productId, int quantity)
         {
-            var cart = await _repository.CreateCartForUserAsync(userId);
+            var cart = await _cartRepo.Entities.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (cart == null)
+            {
+                cart = new Cart { UserId = userId, CreatedDate = DateTime.UtcNow };
+                await _cartRepo.AddAsync(cart);
+            }
 
-            var existingItem = await _repository.GetCartItemAsync(cart.CartId, productId);
+            var existingItem = await _cartItemRepo.Entities.FirstOrDefaultAsync(ci => ci.CartId == cart.CartId && ci.ProductId == productId);
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
-                await _repository.UpdateCartItemQuantityAsync(existingItem.CartItemId, existingItem.Quantity);
+                await _cartItemRepo.UpdateAsync(existingItem);
             }
             else
             {
@@ -59,26 +74,42 @@ namespace BookStore.Services.Implement
                     Quantity = quantity,
                     AddedDate = DateTime.UtcNow
                 };
-                await _repository.AddCartItemAsync(newItem);
+                await _cartItemRepo.AddAsync(newItem);
             }
         }
 
-        public Task UpdateCartItemQuantityAsync(int cartItemId, int newQuantity)
-            => _repository.UpdateCartItemQuantityAsync(cartItemId, newQuantity);
+        public async Task UpdateCartItemQuantityAsync(int cartItemId, int newQuantity)
+        {
+            var item = await _cartItemRepo.GetByIdAsync(cartItemId);
+            if (item != null)
+            {
+                item.Quantity = newQuantity;
+                await _cartItemRepo.UpdateAsync(item);
+            }
+        }
 
-        public Task DeleteCartItemAsync(int cartItemId)
-            => _repository.DeleteCartItemAsync(cartItemId);
+        public async Task DeleteCartItemAsync(int cartItemId)
+        {
+            await _cartItemRepo.DeleteAsync(cartItemId);
+        }
 
-        public Task ClearCartAsync(int cartId)
-            => _repository.ClearCartAsync(cartId);
-        public  CartDTO ToDto(Cart cart)
+        public async Task ClearCartAsync(int cartId)
+        {
+            var items = await _cartItemRepo.Entities.Where(ci => ci.CartId == cartId).ToListAsync();
+            foreach (var item in items)
+            {
+                await _cartItemRepo.DeleteAsync(item.CartItemId);
+            }
+        }
+
+        public CartDTO ToDto(Cart cart)
         {
             return new CartDTO
             {
                 CartId = cart.CartId,
                 UserId = cart.UserId,
                 CreatedDate = cart.CreatedDate,
-                Items = cart.CartItems.Select(ci => new CartItemDTO
+                Items = cart.CartItems?.Select(ci => new CartItemDTO
                 {
                     CartItemId = ci.CartItemId,
                     ProductId = ci.ProductId,
@@ -87,7 +118,7 @@ namespace BookStore.Services.Implement
                     AddedDate = ci.AddedDate,
                     UnitPrice = ci.Product?.Price,
                     ImageUrl = ci.Product?.ImageUrl
-                }).ToList()
+                }).ToList() ?? new List<CartItemDTO>()
             };
         }
     }

@@ -13,24 +13,32 @@ namespace BookStore.Services.Implement
 {
     public class OrderService : IOrderService
     {
-        private readonly IOrderRepository _repo;
-        private readonly IProductRepository _productRepository;
+        private readonly IGenericRepository<Order> _orderRepo;
+        private readonly IGenericRepository<Product> _productRepo;
 
-        public OrderService(IOrderRepository repo, IProductRepository productRepository)
+        public OrderService(IGenericRepository<Order> orderRepo, IGenericRepository<Product> productRepo)
         {
-            _repo = repo;
-            _productRepository = productRepository;
+            _orderRepo = orderRepo;
+            _productRepo = productRepo;
         }
 
         public async Task<IEnumerable<OrderDTO>> GetAllAsync()
         {
-            var orders = await _repo.GetAllAsync();
+            var orders = await _orderRepo.Entities
+                .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
+                .Include(o => o.Status)
+                .Include(o => o.User)
+                .ToListAsync();
             return orders.Select(MapToDto);
         }
 
         public async Task<OrderDTO?> GetByIdAsync(int id)
         {
-            var order = await _repo.GetByIdAsync(id);
+            var order = await _orderRepo.Entities
+                .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
+                .Include(o => o.Status)
+                .Include(o => o.User)
+                .FirstOrDefaultAsync(o => o.OrderId == id);
             return order != null ? MapToDto(order) : null;
         }
 
@@ -48,10 +56,9 @@ namespace BookStore.Services.Implement
                 OrderDetails = new List<OrderDetail>()
             };
 
-            // Duyệt qua từng item và kiểm tra tồn kho
             foreach (var item in dto.Items)
             {
-                var product = await _productRepository.GetProductByIdAsync(item.ProductId);
+                var product = await _productRepo.GetByIdAsync(item.ProductId);
                 if (product == null)
                 {
                     throw new Exception($"Không tìm thấy sản phẩm có ID {item.ProductId}.");
@@ -62,11 +69,9 @@ namespace BookStore.Services.Implement
                     throw new Exception($"Sản phẩm '{product.Title}' không đủ hàng. Tồn kho: {product.Stock}, yêu cầu: {item.Quantity}.");
                 }
 
-                // Trừ số lượng tồn kho
                 product.Stock -= item.Quantity;
-                await _productRepository.UpdateProductAsync(product);
+                await _productRepo.UpdateAsync(product);
 
-                // Thêm vào chi tiết đơn hàng
                 order.OrderDetails.Add(new OrderDetail
                 {
                     ProductId = item.ProductId,
@@ -75,29 +80,33 @@ namespace BookStore.Services.Implement
                 });
             }
 
-            // Thêm đơn hàng vào DB
-            await _repo.AddAsync(order);
+            await _orderRepo.AddAsync(order);
 
             return order.OrderId;
         }
 
-        public async Task DeleteAsync(int id) => await _repo.DeleteAsync(id);
+        public async Task DeleteAsync(int id) => await _orderRepo.DeleteAsync(id);
 
         public async Task<IEnumerable<OrderDTO>> GetOrdersByUserIdAsync(int userId)
         {
-            var orders = await _repo.GetOrdersByUserIdAsync(userId);
+            var orders = await _orderRepo.Entities
+                .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
+                .Include(o => o.Status)
+                .Include(o => o.User)
+                .Where(o => o.UserId == userId)
+                .ToListAsync();
             return orders.Select(MapToDto);
         }
+
         public async Task<bool> UpdateStatusAsync(int orderId, int statusId)
         {
-            var order = await _repo.GetByIdAsync(orderId);
+            var order = await _orderRepo.GetByIdAsync(orderId);
             if (order == null) return false;
 
             order.StatusId = statusId;
-            await _repo.UpdateAsync(order);
+            await _orderRepo.UpdateAsync(order);
             return true;
         }
-
 
         private OrderDTO MapToDto(Order o) => new OrderDTO
         {
@@ -109,15 +118,15 @@ namespace BookStore.Services.Implement
             StatusName = o.Status?.StatusName,
             ShippingAddress = o.ShippingAddress,
             PaymentMethod = o.PaymentMethod,
-            Phone = o.Phone, // Bổ sung dòng này
-            OrderDetails = o.OrderDetails.Select(od => new OrderDetailDTO
+            Phone = o.Phone,
+            OrderDetails = o.OrderDetails?.Select(od => new OrderDetailDTO
             {
                 ProductId = od.ProductId ?? 0,
                 ProductTitle = od.Product?.Title,
                 Quantity = od.Quantity,
                 UnitPrice = od.UnitPrice,
                 ImageUrl = od.Product?.ImageUrl
-            }).ToList()
+            }).ToList() ?? new List<OrderDetailDTO>()
         };
     }
 }
