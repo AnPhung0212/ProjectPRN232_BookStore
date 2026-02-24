@@ -54,13 +54,13 @@ namespace BookStore.Services.Implement
         // Mapping helpers
         private static CategoryDTO MapToDTO(Category c) => new CategoryDTO
         {
-            CategoryId = c.CategoryId,
+            CategoryId = c.CategoryID,
             CategoryName = c.CategoryName
         };
 
         private static Category MapToEntity(CategoryDTO dto) => new Category
         {
-            CategoryId = dto.CategoryId,
+            CategoryID = dto.CategoryId,
             CategoryName = dto.CategoryName
         };
     }

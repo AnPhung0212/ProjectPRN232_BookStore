@@ -38,7 +38,7 @@ namespace BookStore.Services.Implement
                 .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
                 .Include(o => o.Status)
                 .Include(o => o.User)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
+                .FirstOrDefaultAsync(o => o.OrderID == id);
             return order != null ? MapToDto(order) : null;
         }
 
@@ -46,10 +46,10 @@ namespace BookStore.Services.Implement
         {
             var order = new Order
             {
-                UserId = dto.UserId,
+                UserID = dto.UserId,
                 OrderDate = DateTime.UtcNow,
                 TotalAmount = dto.Items.Sum(i => i.UnitPrice * i.Quantity),
-                StatusId = 1, // default pending
+                StatusID = 1, // default pending
                 ShippingAddress = dto.ShippingAddress,
                 PaymentMethod = dto.PaymentMethod,
                 Phone = dto.Phone,
@@ -74,7 +74,7 @@ namespace BookStore.Services.Implement
 
                 order.OrderDetails.Add(new OrderDetail
                 {
-                    ProductId = item.ProductId,
+                    ProductID = item.ProductId,
                     Quantity = item.Quantity,
                     UnitPrice = item.UnitPrice
                 });
@@ -82,7 +82,7 @@ namespace BookStore.Services.Implement
 
             await _orderRepo.AddAsync(order);
 
-            return order.OrderId;
+            return order.OrderID;
         }
 
         public async Task DeleteAsync(int id) => await _orderRepo.DeleteAsync(id);
@@ -93,7 +93,7 @@ namespace BookStore.Services.Implement
                 .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
                 .Include(o => o.Status)
                 .Include(o => o.User)
-                .Where(o => o.UserId == userId)
+                .Where(o => o.UserID == userId)
                 .ToListAsync();
             return orders.Select(MapToDto);
         }
@@ -103,29 +103,29 @@ namespace BookStore.Services.Implement
             var order = await _orderRepo.GetByIdAsync(orderId);
             if (order == null) return false;
 
-            order.StatusId = statusId;
+            order.StatusID = statusId;
             await _orderRepo.UpdateAsync(order);
             return true;
         }
 
         private OrderDTO MapToDto(Order o) => new OrderDTO
         {
-            OrderId = o.OrderId,
-            UserId = o.UserId,
+            OrderId = o.OrderID,
+            UserId = o.UserID,
             OrderDate = o.OrderDate,
             TotalAmount = o.TotalAmount,
-            StatusId = o.StatusId,
+            StatusId = o.StatusID,
             StatusName = o.Status?.StatusName,
             ShippingAddress = o.ShippingAddress,
             PaymentMethod = o.PaymentMethod,
             Phone = o.Phone,
             OrderDetails = o.OrderDetails?.Select(od => new OrderDetailDTO
             {
-                ProductId = od.ProductId ?? 0,
+                ProductId = od.ProductID ?? 0,
                 ProductTitle = od.Product?.Title,
                 Quantity = od.Quantity,
                 UnitPrice = od.UnitPrice,
-                ImageUrl = od.Product?.ImageUrl
+                ImageUrl = od.Product?.ImageURL
             }).ToList() ?? new List<OrderDetailDTO>()
         };
     }

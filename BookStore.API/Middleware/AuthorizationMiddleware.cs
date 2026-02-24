@@ -18,7 +18,7 @@ namespace BookStore.API.Middleware
             _configuration = configuration;
         }
 
-        public async Task Invoke(HttpContext context, BookStoreDbContext dbContext)
+        public async Task Invoke(HttpContext context, BookStoreContext dbContext)
         {
             // 1. Kiểm tra Route công khai trước
             if (EnableAuthorizationRoute.IsPublicRoute(context))
@@ -57,7 +57,7 @@ namespace BookStore.API.Middleware
             await context.Response.WriteAsJsonAsync(new { message = "Unauthorized - Missing or invalid token/key" });
         }
 
-        private async Task<int?> ValidateTokenAndGetUserId(string token, BookStoreDbContext dbContext)
+        private async Task<int?> ValidateTokenAndGetUserId(string token, BookStoreContext dbContext)
         {
             try
             {

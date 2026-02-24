@@ -27,7 +27,7 @@ namespace BookStore.Services.Implement
 
         public async Task<UserDto?> GetUserByIdAsync(int id)
         {
-            var user = await _repo.Entities.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == id);
+            var user = await _repo.Entities.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserID == id);
             return user != null ? ToDto(user) : null;
         }
 
@@ -39,7 +39,7 @@ namespace BookStore.Services.Implement
 
         public async Task<IEnumerable<UserDto>> GetUsersByRoleIdAsync(int roleId)
         {
-            var users = await _repo.Entities.Include(u => u.Role).Where(u => u.RoleId == roleId).ToListAsync();
+            var users = await _repo.Entities.Include(u => u.Role).Where(u => u.RoleID == roleId).ToListAsync();
             return users.Select(ToDto);
         }
 
@@ -82,7 +82,7 @@ namespace BookStore.Services.Implement
         {
             return new UserDto
             {
-                UserId = user.UserId,
+                UserId = user.UserID,
                 Username = user.Username,
                 FullName = user.FullName,
                 Email = user.Email,
@@ -100,7 +100,7 @@ namespace BookStore.Services.Implement
                 FullName = dto.FullName,
                 Email = dto.Email,
                 Address = dto.Address,
-                RoleId = dto.RoleId,
+                RoleID = dto.RoleId,
                 CreatedAt = DateTime.UtcNow
             };
         }

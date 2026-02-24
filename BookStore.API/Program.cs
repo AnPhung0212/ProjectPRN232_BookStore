@@ -71,7 +71,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 // Add Controllers
 builder.Services.AddControllers();
 // Đăng ký DbContext
-builder.Services.AddDbContext<BookStoreDbContext>(options =>
+builder.Services.AddDbContext<BookStoreContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlServerOptionsAction: sqlOptions =>

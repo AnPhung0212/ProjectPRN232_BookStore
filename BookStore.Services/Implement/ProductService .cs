@@ -28,7 +28,7 @@ namespace BookStore.Services.Implement
 
         public async Task<ProductDTO?> GetProductByIdAsync(int id)
         {
-            var product = await _productRepo.Entities.Include(p => p.Category).FirstOrDefaultAsync(p => p.ProductId == id);
+            var product = await _productRepo.Entities.Include(p => p.Category).FirstOrDefaultAsync(p => p.ProductID == id);
 
             if (product == null) return null;
 
@@ -50,7 +50,7 @@ namespace BookStore.Services.Implement
             }
             // Cập nhật có điều kiện (nếu khác null thì mới cập nhật)
             if (dto.CategoryId.HasValue)
-                existingProduct.CategoryId = dto.CategoryId.Value;
+                existingProduct.CategoryID = dto.CategoryId.Value;
 
             if (!string.IsNullOrWhiteSpace(dto.Title))
                 existingProduct.Title = dto.Title;
@@ -68,7 +68,7 @@ namespace BookStore.Services.Implement
                 existingProduct.Stock = dto.Stock.Value;
 
             if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
-                existingProduct.ImageUrl = dto.ImageUrl;
+                existingProduct.ImageURL = dto.ImageUrl;
             
             await _productRepo.UpdateAsync(existingProduct);
         }
@@ -91,7 +91,7 @@ namespace BookStore.Services.Implement
         {
             var products = await _productRepo.Entities
                 .Include(p => p.Category)
-                .Where(p => p.CategoryId == categoryId)
+                .Where(p => p.CategoryID == categoryId)
                 .ToListAsync();
             return products.Select(p => MapToDTO(p));
         }
@@ -99,26 +99,26 @@ namespace BookStore.Services.Implement
         // Mapping helpers
         private ProductDTO MapToDTO(Product p) => new ProductDTO
         {
-            ProductId = p.ProductId,
-            CategoryId = p.CategoryId,
+            ProductId = p.ProductID,
+            CategoryId = p.CategoryID,
             Title = p.Title,
             Author = p.Author,
             Price = p.Price,
             Description = p.Description,
             Stock = p.Stock,
-            ImageUrl = p.ImageUrl,
+            ImageUrl = p.ImageURL,
             CategoryName = p.Category?.CategoryName
         };
 
         private Product MapToEntity(ProductCreateDTO dto) => new Product
         {
-            CategoryId = dto.CategoryId,
+            CategoryID = dto.CategoryId,
             Title = dto.Title,
             Author = dto.Author,
             Price = dto.Price,
             Description = dto.Description,
             Stock = dto.Stock,
-            ImageUrl = dto.ImageUrl
+            ImageURL = dto.ImageUrl
         };
     }
 }
