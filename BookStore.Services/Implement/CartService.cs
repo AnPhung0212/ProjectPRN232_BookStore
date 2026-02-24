@@ -27,7 +27,7 @@ namespace BookStore.Services.Implement
             var cart = await _cartRepo.Entities
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
-                .FirstOrDefaultAsync(c => c.UserId == userId);
+                .FirstOrDefaultAsync(c => c.UserID == userId);
             return cart == null ? null : ToDto(cart);
         }
 
@@ -35,31 +35,31 @@ namespace BookStore.Services.Implement
         {
             var items = await _cartItemRepo.Entities
                 .Include(ci => ci.Product)
-                .Where(ci => ci.CartId == cartId)
+                .Where(ci => ci.CartID == cartId)
                 .ToListAsync();
 
             return items.Select(ci => new CartItemDTO
             {
-                CartItemId = ci.CartItemId,
-                ProductId = ci.ProductId,
+                CartItemId = ci.CartItemID,
+                ProductId = ci.ProductID,
                 ProductName = ci.Product?.Title,
                 Quantity = ci.Quantity,
                 AddedDate = ci.AddedDate,
                 UnitPrice = ci.Product?.Price,
-                ImageUrl = ci.Product?.ImageUrl
+                ImageUrl = ci.Product?.ImageURL
             }).ToList();
         }
 
         public async Task AddCartItemAsync(int userId, int productId, int quantity)
         {
-            var cart = await _cartRepo.Entities.FirstOrDefaultAsync(c => c.UserId == userId);
+            var cart = await _cartRepo.Entities.FirstOrDefaultAsync(c => c.UserID == userId);
             if (cart == null)
             {
-                cart = new Cart { UserId = userId, CreatedDate = DateTime.UtcNow };
+                cart = new Cart { UserID = userId, CreatedDate = DateTime.UtcNow };
                 await _cartRepo.AddAsync(cart);
             }
 
-            var existingItem = await _cartItemRepo.Entities.FirstOrDefaultAsync(ci => ci.CartId == cart.CartId && ci.ProductId == productId);
+            var existingItem = await _cartItemRepo.Entities.FirstOrDefaultAsync(ci => ci.CartID == cart.CartID && ci.ProductID == productId);
             if (existingItem != null)
             {
                 existingItem.Quantity += quantity;
@@ -69,8 +69,8 @@ namespace BookStore.Services.Implement
             {
                 var newItem = new CartItem
                 {
-                    CartId = cart.CartId,
-                    ProductId = productId,
+                    CartID = cart.CartID,
+                    ProductID = productId,
                     Quantity = quantity,
                     AddedDate = DateTime.UtcNow
                 };
@@ -95,10 +95,10 @@ namespace BookStore.Services.Implement
 
         public async Task ClearCartAsync(int cartId)
         {
-            var items = await _cartItemRepo.Entities.Where(ci => ci.CartId == cartId).ToListAsync();
+            var items = await _cartItemRepo.Entities.Where(ci => ci.CartID == cartId).ToListAsync();
             foreach (var item in items)
             {
-                await _cartItemRepo.DeleteAsync(item.CartItemId);
+                await _cartItemRepo.DeleteAsync(item.CartItemID);
             }
         }
 
@@ -106,18 +106,18 @@ namespace BookStore.Services.Implement
         {
             return new CartDTO
             {
-                CartId = cart.CartId,
-                UserId = cart.UserId,
+                CartId = cart.CartID,
+                UserId = cart.UserID,
                 CreatedDate = cart.CreatedDate,
                 Items = cart.CartItems?.Select(ci => new CartItemDTO
                 {
-                    CartItemId = ci.CartItemId,
-                    ProductId = ci.ProductId,
+                    CartItemId = ci.CartItemID,
+                    ProductId = ci.ProductID,
                     ProductName = ci.Product?.Title,
                     Quantity = ci.Quantity,
                     AddedDate = ci.AddedDate,
                     UnitPrice = ci.Product?.Price,
-                    ImageUrl = ci.Product?.ImageUrl
+                    ImageUrl = ci.Product?.ImageURL
                 }).ToList() ?? new List<CartItemDTO>()
             };
         }

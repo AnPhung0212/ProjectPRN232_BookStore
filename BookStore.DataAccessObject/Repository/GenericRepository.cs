@@ -12,10 +12,10 @@ namespace BookStore.DataAccessObject.Repository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly BookStoreDbContext _context;
+        protected readonly BookStoreContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public GenericRepository(BookStoreDbContext context)
+        public GenericRepository(BookStoreContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();
