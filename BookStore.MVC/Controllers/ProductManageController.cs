@@ -16,7 +16,7 @@ namespace BookStore.MVC.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var products = await client.GetFromJsonAsync<List<ProductDTO>>("Product");
             var categories = await client.GetFromJsonAsync<List<CategoryDTO>>("Category");
             foreach (var p in products)
@@ -32,7 +32,7 @@ namespace BookStore.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var categories = await client.GetFromJsonAsync<List<CategoryDTO>>("Category");
 
             var model = new ProductCreateViewModel
@@ -48,13 +48,13 @@ namespace BookStore.MVC.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var client = _httpClientFactory.CreateClient("BookStoreApi");
+                var client = _httpClientFactory.CreateClient("BookStoreAPI");
                 model.Categories = await client.GetFromJsonAsync<List<CategoryDTO>>("Category");
               
                 return View(model);
             }
 
-            var clientPost = _httpClientFactory.CreateClient("BookStoreApi");
+            var clientPost = _httpClientFactory.CreateClient("BookStoreAPI");
             // Lấy token từ Session
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))
@@ -79,7 +79,7 @@ namespace BookStore.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))
             {
@@ -107,19 +107,17 @@ namespace BookStore.MVC.Controllers
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login", "User");
 
-            using var client = new HttpClient();
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await client.GetAsync($"https://localhost:7266/api/Product/{id}");
+            var response = await client.GetAsync($"Product/{id}");
             if (!response.IsSuccessStatusCode)
                 return NotFound();
 
             var productJson = await response.Content.ReadAsStringAsync();
             var product = JsonConvert.DeserializeObject<UpdateProductDTO>(productJson);
 
-            var categoriesResponse = await client.GetAsync($"https://localhost:7266/api/Category");
-            var categoryJson = await categoriesResponse.Content.ReadAsStringAsync();
-            var categories = JsonConvert.DeserializeObject<List<CategoryDTO>>(categoryJson);
+            var categories = await client.GetFromJsonAsync<List<CategoryDTO>>("Category");
 
             var viewModel = new ProductCreateViewModel
             {
@@ -137,13 +135,13 @@ namespace BookStore.MVC.Controllers
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login", "User");
 
-            using var client = new HttpClient();
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var json = JsonConvert.SerializeObject(model.ProductEdit);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PutAsync($"https://localhost:7266/api/Product/{model.ProductEdit.ProductId}", content);
+            var response = await client.PutAsync($"Product/{model.ProductEdit.ProductId}", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -152,6 +150,8 @@ namespace BookStore.MVC.Controllers
             }
 
             ModelState.AddModelError(string.Empty, "Cập nhật sản phẩm thất bại");
+            // nạp lại categories để view hiển thị dropdown đầy đủ
+            model.Categories = await client.GetFromJsonAsync<List<CategoryDTO>>("Category");
             return View(model);
         }
 

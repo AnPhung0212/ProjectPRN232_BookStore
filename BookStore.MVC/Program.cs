@@ -10,10 +10,10 @@ builder.Services.AddSession();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Cấu hình HTTP client gọi API
-var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"];
-builder.Services.AddHttpClient("BookStoreApi", client =>
+builder.Services.AddHttpClient("BookStoreAPI", client =>
 {
-    client.BaseAddress = new Uri(apiBaseUrl!);
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
 var app = builder.Build();

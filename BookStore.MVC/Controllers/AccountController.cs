@@ -23,7 +23,7 @@ namespace BookStore.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(UserLoginDto loginDto)
         {
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var response = await client.PostAsJsonAsync("user/login", loginDto);
 
             if (!response.IsSuccessStatusCode)
@@ -65,7 +65,7 @@ namespace BookStore.MVC.Controllers
         {
             registerDto.RoleId = 2;
 
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var response = await client.PostAsJsonAsync("user/register", registerDto);
 
             if (!response.IsSuccessStatusCode)

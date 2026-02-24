@@ -48,7 +48,7 @@ namespace BookStore.MVC.Controllers
             }
             else
             {
-                var client = _httpClientFactory.CreateClient("BookStoreApi");
+                var client = _httpClientFactory.CreateClient("BookStoreAPI");
                 var response = await client.GetAsync($"product/{productId}");
 
                 if (!response.IsSuccessStatusCode)
