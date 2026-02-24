@@ -19,7 +19,7 @@ namespace BookStore.MVC.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var client = _clientFactory.CreateClient("BookStoreApi");
+            var client = _clientFactory.CreateClient("BookStoreAPI");
 
             var productResponse = await client.GetAsync("Product");
             if (!productResponse.IsSuccessStatusCode)

@@ -25,8 +25,7 @@ namespace BookStore.MVC.Controllers
             if (userId == 0)
                 return RedirectToAction("Login", "Account");
 
-            var client = _clientFactory.CreateClient();
-            client.BaseAddress = new Uri(_configuration["ApiSettings:BaseUrl"]);
+            var client = _clientFactory.CreateClient("BookStoreAPI");
 
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))
@@ -66,7 +65,7 @@ namespace BookStore.MVC.Controllers
                 return View("Error");
             }
 
-            var client = _clientFactory.CreateClient("BookStoreApi");
+            var client = _clientFactory.CreateClient("BookStoreAPI");
 
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))
@@ -119,7 +118,7 @@ namespace BookStore.MVC.Controllers
                 return View("Error");
             }
 
-            var client = _clientFactory.CreateClient("BookStoreApi");
+            var client = _clientFactory.CreateClient("BookStoreAPI");
 
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))

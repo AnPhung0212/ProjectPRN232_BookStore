@@ -17,7 +17,7 @@ namespace BookStore.MVC.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var categories = await client.GetFromJsonAsync<List<CategoryDTO>>("Category");
             return View(categories);
         }
@@ -30,7 +30,7 @@ namespace BookStore.MVC.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -54,7 +54,7 @@ namespace BookStore.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var response = await client.GetAsync($"Category/{id}");
 
             if (!response.IsSuccessStatusCode) return NotFound();
@@ -76,7 +76,7 @@ namespace BookStore.MVC.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -98,7 +98,7 @@ namespace BookStore.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

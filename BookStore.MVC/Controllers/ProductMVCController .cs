@@ -14,7 +14,7 @@ namespace BookStore.MVC.Controllers
         }
         public async Task<IActionResult> Index(string search, int? categoryId)
         {
-            var client = _clientFactory.CreateClient("BookStoreApi");
+            var client = _clientFactory.CreateClient("BookStoreAPI");
 
             // Gọi API lấy danh mục
             var categoryResp = await client.GetAsync("Category");
@@ -56,7 +56,7 @@ namespace BookStore.MVC.Controllers
         }
         public async Task<IActionResult> Detail(int id)
         {
-            var client = _clientFactory.CreateClient("BookStoreApi");
+            var client = _clientFactory.CreateClient("BookStoreAPI");
 
             // 1. Gọi API lấy thông tin sách
             var response = await client.GetAsync($"Product/{id}");

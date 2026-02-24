@@ -15,7 +15,7 @@ namespace BookStore.MVC.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var token = HttpContext.Session.GetString("JWToken");
             if (!string.IsNullOrEmpty(token))
             {

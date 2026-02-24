@@ -1,16 +1,10 @@
 ﻿using BookStore.BusinessObject.DTO;
 using BookStore.BusinessObject.DTO.DtoForOrder;
-using BookStore.BusinessObject.DTO.UserDTOs;
-using BookStore.BusinessObject.Models;
 using BookStore.MVC.Helpers;
 using BookStore.MVC.Library;
-using BookStore.MVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
 using VNPAY.NET.Models;
 
@@ -29,7 +23,6 @@ namespace BookStore.MVC.Controllers
         public async Task<IActionResult> Checkout(string ShippingAddress, string PhoneNumber, string PaymentMethod)
         {
             var token = HttpContext.Session.GetString("JWToken");
-            var userEmail = HttpContext.Session.GetString("UserEmail");
             var userIdStr = HttpContext.Session.GetString("UserId");
 
             if (string.IsNullOrWhiteSpace(ShippingAddress) || string.IsNullOrWhiteSpace(PhoneNumber) || string.IsNullOrWhiteSpace(PaymentMethod))
@@ -68,14 +61,13 @@ namespace BookStore.MVC.Controllers
 
             if (PaymentMethod == "VNPAY")
             {
-                // Chuyển sang VNPAY mà chưa tạo đơn hàng
-                var totalAmount = cart.Items.Sum(i => i.Quantity * (i.UnitPrice ?? 0)) + 30000; // shipping fee
-                HttpContext.Session.SetObjectAsJson("PENDING_ORDER", orderDto); // Lưu tạm OrderCreateDTO vào session
+                var totalAmount = cart.Items.Sum(i => i.Quantity * (i.UnitPrice ?? 0)) + 30000;
+                HttpContext.Session.SetObjectAsJson("PENDING_ORDER", orderDto);
 
                 var paymentRequest = new PaymentRequest
                 {
-                    PaymentId = 0, // chưa có ID, sẽ gán sau khi thanh toán thành công
-                    Money =(double)totalAmount
+                    PaymentId = 0,
+                    Money = (double)totalAmount
                 };
 
                 var vnpayService = new VnpayService(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build());
@@ -84,11 +76,10 @@ namespace BookStore.MVC.Controllers
                 return Redirect(paymentUrl);
             }
 
-            // Nếu là Cash thì tạo đơn hàng luôn
-            var client = _clientFactory.CreateClient("BookStoreApi");
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            var client = _clientFactory.CreateClient("BookStoreAPI");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var orderResponse = await client.PostAsJsonAsync("orders/create", orderDto);
+            var orderResponse = await client.PostAsJsonAsync("Orders/create", orderDto);
             if (!orderResponse.IsSuccessStatusCode)
             {
                 TempData["Error"] = "Đặt hàng thất bại. Vui lòng thử lại.";
@@ -111,14 +102,13 @@ namespace BookStore.MVC.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var client = _clientFactory.CreateClient("BookStoreApi");
+            var client = _clientFactory.CreateClient("BookStoreAPI");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            // Gọi API lấy đơn hàng theo id
-            var response = await client.GetAsync($"orders/{id}");
+            var response = await client.GetAsync($"Orders/{id}");
             if (!response.IsSuccessStatusCode)
             {
-                return NotFound(); // hoặc trả lỗi rõ ràng hơn
+                return NotFound();
             }
 
             var responseBody = await response.Content.ReadAsStringAsync();
@@ -130,8 +120,9 @@ namespace BookStore.MVC.Controllers
             }
 
             ViewBag.SuccessMessage = TempData["Success"];
-            return View(order); // Truyền đúng model OrderDTO vào view
+            return View(order);
         }
+
         public async Task<IActionResult> OrderHistory()
         {
             var userIdStr = HttpContext.Session.GetString("UserId");
@@ -145,14 +136,12 @@ namespace BookStore.MVC.Controllers
 
             ViewBag.UserId = userId;
 
-            var client = _clientFactory.CreateClient("BookStoreApi");
+            var client = _clientFactory.CreateClient("BookStoreAPI");
 
-            // Nếu cần token auth:
             var token = HttpContext.Session.GetString("JWToken");
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-
-            var response = await client.GetAsync($"orders/user/{userId}");
+            var response = await client.GetAsync($"Orders/user/{userId}");
             Console.WriteLine($"[OrderHistory] Status: {response.StatusCode}");
 
             if (response.IsSuccessStatusCode)
@@ -170,6 +159,7 @@ namespace BookStore.MVC.Controllers
                 return View(new List<OrderDTO>());
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> PaymentReturn()
         {
@@ -182,7 +172,6 @@ namespace BookStore.MVC.Controllers
                 return RedirectToAction("ViewCart", "Cart");
             }
 
-            // Nếu thanh toán thành công, có thể cập nhật trạng thái đơn hàng ở đây
             var orderDto = HttpContext.Session.GetObjectFromJson<OrderCreateDTO>("PENDING_ORDER");
             if (orderDto == null)
             {
@@ -191,11 +180,10 @@ namespace BookStore.MVC.Controllers
             }
 
             var token = HttpContext.Session.GetString("JWToken");
-            var client = _clientFactory.CreateClient("BookStoreApi");
+            var client = _clientFactory.CreateClient("BookStoreAPI");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            // ✅ Gửi đơn hàng lên API
-            var orderResponse = await client.PostAsJsonAsync("orders/create", orderDto);
+            var orderResponse = await client.PostAsJsonAsync("Orders/create", orderDto);
             if (!orderResponse.IsSuccessStatusCode)
             {
                 TempData["Error"] = "Tạo đơn hàng thất bại sau khi thanh toán.";
@@ -204,7 +192,6 @@ namespace BookStore.MVC.Controllers
 
             int orderId = await orderResponse.Content.ReadFromJsonAsync<int>();
 
-            // ✅ Dọn session
             HttpContext.Session.Remove("CART_SESSION");
             HttpContext.Session.Remove("PENDING_ORDER");
 
