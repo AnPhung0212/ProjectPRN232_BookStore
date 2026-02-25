@@ -43,55 +43,55 @@ namespace BookStore.Services.Implement
             _logger = logger;
         }
 
-        public async Task<string> RegisterUserAsync(RegisterInput input)
-        {
-            if (input == null)
-                return "Không đc để trống thông tin đăng ký";
+public async Task<string> RegisterUserAsync(RegisterInput input)
+{
+    if (input == null)
+        return "Không đc để trống thông tin đăng ký";
 
-            if (!IsValidPassword(input.Password))
-                return "Mật khẩu yếu.";
+    if (!IsValidPassword(input.Password))
+        return "Mật khẩu yếu.";
 
-            // check trùng username / email
-            var existedUser = await _userRepository.Entities
-                .FirstOrDefaultAsync(u => u.Username == input.UserName || u.Email == input.Email);
+    // check trùng username / email
+    var existedUser = await _userRepository.Entities
+        .FirstOrDefaultAsync(u => u.Username == input.UserName || u.Email == input.Email);
 
-            if (existedUser != null)
-                return "Username hoặc Email đã tồn tại.";
+    if (existedUser != null)
+        return "Username hoặc Email đã tồn tại.";
 
-            var user = new User
-            {
-                Username = input.UserName,
-                Password = input.Password, // TODO: hash
-                Email = input.Email,
-                CreatedAt = DateTime.UtcNow,
-                Address = input.Address,
-                IsActive = false
-            };
+    var user = new User
+    {
+        Username = input.UserName,
+        Password = input.Password, // TODO: hash
+        Email = input.Email,
+        CreatedAt = DateTime.UtcNow,
+        Address = input.Address,
+        IsActive = false
+    };
 
-            // LƯU USER TRƯỚC để có UserID
-            await _userRepository.AddAsync(user);
+    // LƯU USER TRƯỚC để có UserID
+    await _userRepository.AddAsync(user);
 
-            // Generate token sau khi UserID đã có
-            var token = GenerateEmailToken(user.UserID);
-            string subject = "Xác nhận email đăng ký tài khoản BookStore";
+    // Generate token sau khi UserID đã có
+    var token = GenerateEmailToken(user.UserID);
+    string subject = "Xác nhận email đăng ký tài khoản BookStore";
 
-            // Đảm bảo BaseUrl trỏ đúng MVC: vd https://.../Account/VerifyEmail
-            string confirmUrl = $"{_mailSettings.BaseUrl}?token={token}";
-            string body = EmailTemplate.BodyRegister.Replace("{{confirmUrl}}", confirmUrl);
+    // Đảm bảo BaseUrl trỏ đúng MVC: vd https://.../Account/VerifyEmail
+    string confirmUrl = $"{_mailSettings.BaseUrl}?token={token}";
+    string body = EmailTemplate.BodyRegister.Replace("{{confirmUrl}}", confirmUrl);
 
-            try
-            {
-                await _mailService.SendEmailAsync(user.Email!, subject, body);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error sending verification email to {Email}", user.Email);
-                // Tùy policy: user đã được tạo nhưng chưa verify được qua email
-                return "Đăng ký thành công nhưng gửi email xác nhận thất bại. Vui lòng thử lại sau.";
-            }
+    try
+    {
+        await _mailService.SendEmailAsync(user.Email!, subject, body);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error sending verification email to {Email}", user.Email);
+        // Tùy policy: user đã được tạo nhưng chưa verify được qua email
+        return "Đăng ký thành công nhưng gửi email xác nhận thất bại. Vui lòng thử lại sau.";
+    }
 
-            return "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản.";
-        }
+    return "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản.";
+}
         public async Task<(int StatusCode, string Message)> VerifyUserAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
