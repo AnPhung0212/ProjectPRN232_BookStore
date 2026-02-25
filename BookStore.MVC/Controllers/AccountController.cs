@@ -1,5 +1,6 @@
 ﻿using BookStore.BusinessObject.DTO.UserDTOs;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace BookStore.MVC.Controllers
@@ -20,23 +21,26 @@ namespace BookStore.MVC.Controllers
             return View();
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Login(UserLoginDto loginDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(loginDto);
+            }
+
             var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var response = await client.PostAsJsonAsync("user/login", loginDto);
 
             if (!response.IsSuccessStatusCode)
             {
                 ViewBag.Error = "Invalid email or password.";
-                return View();
+                return View(loginDto);
             }
 
             var result = await response.Content.ReadFromJsonAsync<UserResponseDto>();
             if (result != null)
             {
-                // Lưu token vào Session hoặc Cookie
                 HttpContext.Session.SetString("JWToken", result.Token);
                 HttpContext.Session.SetString("Username", result.User.Username);
                 HttpContext.Session.SetString("UserEmail", result.User.Email);
@@ -46,37 +50,59 @@ namespace BookStore.MVC.Controllers
             }
 
             ViewBag.Error = "Login failed.";
-            return View();
+            return View(loginDto);
         }
 
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index", "Home");
         }
 
-        // tiếp đến đăng ký
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Register(UserCreateDto registerDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(registerDto);
+            }
+
             registerDto.RoleId = 2;
 
             var client = _httpClientFactory.CreateClient("BookStoreAPI");
             var response = await client.PostAsJsonAsync("user/register", registerDto);
 
-            if (!response.IsSuccessStatusCode)
+            var content = await response.Content.ReadAsStringAsync();
+            string apiMessage = "Đăng ký thất bại. Vui lòng kiểm tra thông tin.";
+
+            try
             {
-                ViewBag.Error = "Đăng ký thất bại. Vui lòng kiểm tra thông tin.";
-                return View();
+                using var doc = JsonDocument.Parse(content);
+                if (doc.RootElement.TryGetProperty("message", out var msgProp))
+                {
+                    apiMessage = msgProp.GetString() ?? apiMessage;
+                }
+            }
+            catch
+            {
+                // ignore parse error, giữ message mặc định
             }
 
-            return RedirectToAction("Login", "Account", new { successMessage = "Đăng ký thành công! Vui lòng đăng nhập." });
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.Error = apiMessage;
+                return View(registerDto);
+            }
+
+            return RedirectToAction("Login", "Account", new { successMessage = apiMessage });
         }
+
         // GET: /Account/VerifyEmail?token=...
         [HttpGet]
         public async Task<IActionResult> VerifyEmail(string token)
@@ -88,15 +114,13 @@ namespace BookStore.MVC.Controllers
                 return View();
             }
 
-            var client = _httpClientFactory.CreateClient("BookStoreApi");
+            var client = _httpClientFactory.CreateClient("BookStoreAPI");
 
-            // Giả sử API verify dùng GET /api/user/verify-email?token=...
-            var response = await client.GetAsync($"/api/user/verify-email?token={Uri.EscapeDataString(token)}");
+            var response = await client.PostAsJsonAsync("user/verify-email", token);
 
             string apiMessage = "Có lỗi xảy ra.";
             try
             {
-                // API hiện đang trả { message = "..." }
                 var content = await response.Content.ReadAsStringAsync();
                 using var doc = JsonDocument.Parse(content);
                 if (doc.RootElement.TryGetProperty("message", out var msgProp))
