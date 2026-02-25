@@ -74,7 +74,6 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.Configure<JwtEmailSettings>(builder.Configuration.GetSection("JwtEmailSettings"));
-
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 
 // Add Controllers
