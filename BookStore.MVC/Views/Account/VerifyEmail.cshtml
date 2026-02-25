@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Xác thực tài khoản";
+    bool success = ViewBag.Success is bool b && b;
+    string message = ViewBag.Message as string ?? "";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">Xác thực tài khoản</h3>
+                </div>
+
+                <div class="card-body text-center">
+                    @if (success)
+                    {
+                        <div class="mb-3">
+                            <span class="text-success display-6">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </span>
+                        </div>
+                        <h5 class="text-success mb-3">Xác thực thành công</h5>
+                        <p class="mb-4">
+                            @message
+                        </p>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary">
+                            Đến trang đăng nhập
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="mb-3">
+                            <span class="text-danger display-6">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </span>
+                        </div>
+                        <h5 class="text-danger mb-3">Xác thực thất bại</h5>
+                        <p class="mb-4">
+                            @message
+                        </p>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary me-2">
+                            Về trang chủ
+                        </a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary">
+                            Đăng ký lại
+                        </a>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

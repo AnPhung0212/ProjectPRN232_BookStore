@@ -1,5 +1,6 @@
 ﻿using BookStore.API.Helpers;
 using BookStore.BusinessObject.DTO.UserDTOs;
+using BookStore.Services.Implement;
 using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,12 +15,14 @@ namespace BookStore.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IRegisterService _registerService;
         private readonly IConfiguration _configuration;
 
-        public UserController(IUserService userService, IConfiguration configuration)
+        public UserController(IUserService userService, IConfiguration configuration, IRegisterService registerService)
         {
             _userService = userService;
             _configuration = configuration;
+            _registerService = registerService;
         }
 
         /// <summary>
@@ -44,7 +47,15 @@ namespace BookStore.API.Controllers
             await _userService.AddUserAsync(dto);
             return Ok("User created");
         }
-
+        /// <summary>
+        /// Xác thực tài khoản 
+        /// </summary>
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] string token)
+        {
+            var (statusCode, message) = await _registerService.VerifyUserAsync(token);
+            return StatusCode(statusCode, new { message });
+        }
         /// <summary>
         /// Lấy danh sách toàn bộ người dùng trong hệ thống (Admin only)
         /// </summary>

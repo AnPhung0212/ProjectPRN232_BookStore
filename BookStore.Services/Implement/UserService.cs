@@ -33,7 +33,7 @@ namespace BookStore.Services.Implement
 
         public async Task<UserDto?> AuthenticateAsync(UserLoginDto loginDto)
         {
-            var user = await _repo.Entities.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == loginDto.Email && u.Password == loginDto.Password);
+            var user = await _repo.Entities.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == loginDto.Email && u.Password == loginDto.Password && u.IsActive == true);
             return user != null ? ToDto(user) : null;
         }
 
