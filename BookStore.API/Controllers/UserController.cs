@@ -45,23 +45,14 @@ namespace BookStore.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterInput dto)
         {
-            try
-            {
-                var resultMessage = await _registerService.RegisterUserAsync(dto);
+            var resultMessage = await _registerService.RegisterUserAsync(dto);
 
-                // Có thể kiểm tra message, hoặc tốt hơn: đổi RegisterUserAsync trả (bool isSuccess, string message)
-                if (resultMessage.StartsWith("Đăng ký thành công"))
-                {
-                    return Ok(new { message = resultMessage });
-                }
-
-                return BadRequest(new { message = resultMessage });
-            }
-            catch (Exception ex)
+            if (resultMessage.StartsWith("Đăng ký thành công"))
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new { message = "Có lỗi xảy ra trong quá trình đăng ký." });
+                return Ok(new { message = resultMessage });
             }
+
+            return BadRequest(new { message = resultMessage });
         }
         /// <summary>
         /// Xác thực tài khoản 
