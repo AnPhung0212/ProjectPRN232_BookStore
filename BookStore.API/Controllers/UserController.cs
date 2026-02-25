@@ -1,6 +1,7 @@
 ﻿using BookStore.API.Helpers;
 using BookStore.BusinessObject.DTO.UserDTOs;
 using BookStore.Services.Implement;
+using BookStore.Services.Implement.Input;
 using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -42,10 +43,25 @@ namespace BookStore.API.Controllers
         /// Đăng ký tài khoản người dùng mới
         /// </summary>
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserCreateDto dto)
+        public async Task<IActionResult> Register(RegisterInput dto)
         {
-            await _userService.AddUserAsync(dto);
-            return Ok("User created");
+            try
+            {
+                var resultMessage = await _registerService.RegisterUserAsync(dto);
+
+                // Có thể kiểm tra message, hoặc tốt hơn: đổi RegisterUserAsync trả (bool isSuccess, string message)
+                if (resultMessage.StartsWith("Đăng ký thành công"))
+                {
+                    return Ok(new { message = resultMessage });
+                }
+
+                return BadRequest(new { message = resultMessage });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = "Có lỗi xảy ra trong quá trình đăng ký." });
+            }
         }
         /// <summary>
         /// Xác thực tài khoản 

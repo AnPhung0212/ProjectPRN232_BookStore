@@ -49,7 +49,7 @@ namespace BookStore.Services.Implement
                 return "Không đc để trống thông tin đăng ký";
 
             if (!IsValidPassword(input.Password))
-                return  "Mật khẩu yếu.";
+                return "Mật khẩu yếu.";
 
             // check trùng username / email
             var existedUser = await _userRepository.Entities
@@ -68,11 +68,17 @@ namespace BookStore.Services.Implement
                 IsActive = false
             };
 
+            // LƯU USER TRƯỚC để có UserID
+            await _userRepository.AddAsync(user);
+
+            // Generate token sau khi UserID đã có
             var token = GenerateEmailToken(user.UserID);
             string subject = "Xác nhận email đăng ký tài khoản BookStore";
-            string confirmUrl = $"{_mailSettings.BaseUrl}/verify-email?token={token}";
+
+            // Đảm bảo BaseUrl trỏ đúng MVC: vd https://.../Account/VerifyEmail
+            string confirmUrl = $"{_mailSettings.BaseUrl}?token={token}";
             string body = EmailTemplate.BodyRegister.Replace("{{confirmUrl}}", confirmUrl);
-            await _mailService.SendEmailAsync(user.Email!, subject, body);
+
             try
             {
                 await _mailService.SendEmailAsync(user.Email!, subject, body);
@@ -80,14 +86,12 @@ namespace BookStore.Services.Implement
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending verification email to {Email}", user.Email);
-                return "Có lỗi khi gửi email xác nhận. Vui lòng thử lại sau.";
+                // Tùy policy: user đã được tạo nhưng chưa verify được qua email
+                return "Đăng ký thành công nhưng gửi email xác nhận thất bại. Vui lòng thử lại sau.";
             }
-            await _userRepository.AddAsync(user);
 
-            return (
-                "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản.");
+            return "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản.";
         }
-
         public async Task<(int StatusCode, string Message)> VerifyUserAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
