@@ -1,5 +1,6 @@
 ﻿using BookStore.BusinessObject.DTO.UserDTOs;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace BookStore.MVC.Controllers
 {
@@ -75,6 +76,46 @@ namespace BookStore.MVC.Controllers
             }
 
             return RedirectToAction("Login", "Account", new { successMessage = "Đăng ký thành công! Vui lòng đăng nhập." });
+        }
+        // GET: /Account/VerifyEmail?token=...
+        [HttpGet]
+        public async Task<IActionResult> VerifyEmail(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                ViewBag.Success = false;
+                ViewBag.Message = "Token không hợp lệ.";
+                return View();
+            }
+
+            var client = _httpClientFactory.CreateClient("BookStoreApi");
+
+            // Giả sử API verify dùng GET /api/user/verify-email?token=...
+            var response = await client.GetAsync($"/api/user/verify-email?token={Uri.EscapeDataString(token)}");
+
+            string apiMessage = "Có lỗi xảy ra.";
+            try
+            {
+                // API hiện đang trả { message = "..." }
+                var content = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(content);
+                if (doc.RootElement.TryGetProperty("message", out var msgProp))
+                {
+                    apiMessage = msgProp.GetString() ?? apiMessage;
+                }
+                else
+                {
+                    apiMessage = content;
+                }
+            }
+            catch
+            {
+                // ignore parse error, dùng message mặc định
+            }
+
+            ViewBag.Success = response.IsSuccessStatusCode;
+            ViewBag.Message = apiMessage;
+            return View();
         }
     }
 }

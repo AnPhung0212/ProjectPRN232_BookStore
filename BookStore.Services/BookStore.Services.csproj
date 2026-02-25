@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BookSotre.Helper\BookSotre.Helper.csproj" />
     <ProjectReference Include="..\BookStore.DataAccessObject\BookStore.DataAccessObject.csproj" />
   </ItemGroup>
 

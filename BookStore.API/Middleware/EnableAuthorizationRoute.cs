@@ -14,7 +14,9 @@ namespace BookStore.API.Middleware
             "/api/Product",         // Cho phép xem sản phẩm, category, v.v.
             "/api/Category",
             "/swagger",             // Cho phép vào trang tài liệu API
-            "/favicon.ico"
+            "/favicon.ico",
+            "/api/User/verify-email"
+
         };
 
         public static bool IsPublicRoute(HttpContext httpContext)

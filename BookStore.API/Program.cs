@@ -12,6 +12,9 @@ using BookStore.DataAccessObject.IRepository;
 using BookStore.DataAccessObject.Repository;
 using Microsoft.EntityFrameworkCore;
 using BookStore.API.Middleware;
+using BookStore.Services.Catalog.MailServices;
+using BookStore.BusinessObject.Config;
+using static BookStore.BusinessObject.Config.MailSetting;
 
 var builder = WebApplication.CreateBuilder(args);
 //Connect VNPay API
@@ -67,6 +70,12 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+// Đăng ký mail service và cấu hình
+builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<JwtEmailSettings>(builder.Configuration.GetSection("JwtEmailSettings"));
+
+builder.Services.AddScoped<IRegisterService, RegisterService>();
 
 // Add Controllers
 builder.Services.AddControllers();
