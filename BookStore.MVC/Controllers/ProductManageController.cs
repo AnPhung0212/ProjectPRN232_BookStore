@@ -72,9 +72,9 @@ namespace BookStore.MVC.Controllers
                     new MediaTypeHeaderValue(model.ImageFile.ContentType);
 
                 form.Add(fileContent, "file", model.ImageFile.FileName);
-                form.Add(new StringContent("books"), "folder");
 
-                var uploadResponse = await clientPost.PostAsync("Storage/upload", form);
+
+                var uploadResponse = await clientPost.PostAsync("storage/upload", form);
                 if (!uploadResponse.IsSuccessStatusCode)
                 {
                     ModelState.AddModelError(string.Empty, "Upload ảnh thất bại.");
@@ -177,9 +177,9 @@ namespace BookStore.MVC.Controllers
                     new MediaTypeHeaderValue(model.ImageFile.ContentType);
 
                 form.Add(fileContent, "file", model.ImageFile.FileName);
-                form.Add(new StringContent("books"), "folder");
 
-                var uploadResponse = await client.PostAsync("Storage/upload", form);
+
+                var uploadResponse = await client.PostAsync("storage/upload", form);
                 if (!uploadResponse.IsSuccessStatusCode)
                 {
                     ModelState.AddModelError(string.Empty, "Upload ảnh thất bại.");
