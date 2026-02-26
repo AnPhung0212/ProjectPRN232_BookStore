@@ -91,7 +91,8 @@
     <div class="container product-detail-card">
         <div class="row align-items-center">
             <div class="col-md-5 col-12">
-                <img src="@Url.Content(string.IsNullOrEmpty(Model.ImageUrl) ? "~/images/noimage.png" : "~/images/" + Model.ImageUrl)" class="product-detail-img" alt="@Model.Title">
+                <img src="@Url.Content(string.IsNullOrEmpty(Model.ImageUrl) ? "~/images/noimage.png" : Model.ImageUrl)"
+                     class="product-detail-img" alt="@Model.Title">
             </div>
             <div class="col-md-7 col-12">
                 <h1 class="mb-2">@Model.Title</h1>
@@ -125,7 +126,7 @@
                     <div class="col-md-3 col-sm-6 mb-4">
                         <a href="@Url.Action("Detail", "ProductMVC", new { id = related.ProductId })" class="text-decoration-none text-dark">
                             <div class="book-card">
-                                <img src="@Url.Content(string.IsNullOrEmpty(related.ImageUrl) ? "~/images/noimage.png" : "~/images/" + related.ImageUrl)" alt="@related.Title">
+                                <img src="@Url.Content(string.IsNullOrEmpty(related.ImageUrl) ? "~/images/noimage.png" : related.ImageUrl)" alt="@related.Title">
                                 <div class="card-body">
                                     <h5 class="book-title">@related.Title</h5>
                                     <p class="text-muted">Tác giả: @related.Author</p>

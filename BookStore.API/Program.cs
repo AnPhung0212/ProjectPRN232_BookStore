@@ -15,6 +15,8 @@ using BookStore.API.Middleware;
 using BookStore.Services.Catalog.MailServices;
 using BookStore.BusinessObject.Config;
 using static BookStore.BusinessObject.Config.MailSetting;
+using Microsoft.Extensions.Options;
+using Supabase;
 
 var builder = WebApplication.CreateBuilder(args);
 //Connect VNPay API
@@ -126,6 +128,23 @@ builder.Services.AddSwaggerGen(option =>
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
     option.IncludeXmlComments(xmlPath);
+});
+
+builder.Services.Configure<SupabaseSettings>(
+    builder.Configuration.GetSection("Supabase"));
+
+builder.Services.AddSingleton(provider =>
+{
+    var config = provider.GetRequiredService<IOptions<SupabaseSettings>>().Value;
+
+    var options = new SupabaseOptions
+    {
+        AutoConnectRealtime = false
+    };
+
+    var client = new Client(config.Url, config.Key, options);
+    client.InitializeAsync().GetAwaiter().GetResult();
+    return client;
 });
 
 var app = builder.Build();

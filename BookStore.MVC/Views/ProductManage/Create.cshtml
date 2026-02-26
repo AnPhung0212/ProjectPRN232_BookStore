@@ -50,12 +50,6 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="Product.ImageUrl"></label>
-        <input asp-for="Product.ImageUrl" class="form-control" />
-        <span asp-validation-for="Product.ImageUrl" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
         <label asp-for="Product.CategoryId">Danh mục</label>
         <select asp-for="Product.CategoryId" asp-items="@(new SelectList(Model.Categories, "CategoryId", "CategoryName"))" class="form-control">
             <option value="">-- Chọn danh mục --</option>
@@ -63,6 +57,11 @@
         <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
     </div>
 
+    <div class="form-group">
+        <label class="form-label">Ảnh sản phẩm</label>
+        <input asp-for="ImageFile" type="file" accept="image/*" class="form-control" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+    </div>
     <button type="submit" class="btn btn-primary">Tạo</button>
 </form>
 
