@@ -40,7 +40,20 @@
         </select>
         <span asp-validation-for="ProductEdit.CategoryId" class="text-danger"></span>
     </div>
+    <!-- update ảnh -->
+    @if (!string.IsNullOrEmpty(Model.ProductEdit?.ImageUrl))
+    {
+        <div class="form-group mt-3">
+            <label>Ảnh hiện tại</label><br />
+            <img src="@Model.ProductEdit.ImageUrl" style="max-width:150px" />
+        </div>
+    }
 
+    <div class="form-group mt-3">
+        <label class="form-label">Ảnh mới (nếu muốn thay)</label>
+        <input asp-for="ImageFile" type="file" accept="image/*" class="form-control" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+    </div>
     <button type="submit" class="btn btn-primary">Cập nhật</button>
     <a asp-action="Index" class="btn btn-secondary">Hủy</a>
 </form>

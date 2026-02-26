@@ -1,4 +1,8 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using BookStore.BusinessObject.Config;
+using Microsoft.Extensions.Options;
+using Supabase; // Add this at the top of the file
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

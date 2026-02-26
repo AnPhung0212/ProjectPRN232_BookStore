@@ -61,7 +61,36 @@ namespace BookStore.MVC.Controllers
             {
                 clientPost.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
+            // 1. Upload ảnh nếu có
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                using var form = new MultipartFormDataContent();
 
+                await using var stream = model.ImageFile.OpenReadStream();
+                var fileContent = new StreamContent(stream);
+                fileContent.Headers.ContentType =
+                    new MediaTypeHeaderValue(model.ImageFile.ContentType);
+
+                form.Add(fileContent, "file", model.ImageFile.FileName);
+                form.Add(new StringContent("books"), "folder");
+
+                var uploadResponse = await clientPost.PostAsync("Storage/upload", form);
+                if (!uploadResponse.IsSuccessStatusCode)
+                {
+                    ModelState.AddModelError(string.Empty, "Upload ảnh thất bại.");
+                    model.Categories = await clientPost.GetFromJsonAsync<List<CategoryDTO>>("Category");
+                    return View(model);
+                }
+
+                var uploadResult =
+                    await uploadResponse.Content.ReadFromJsonAsync<UploadResult>();
+
+                if (uploadResult != null)
+                {
+                    // Gán URL ảnh vào DTO gửi sang Product API
+                    model.Product.ImageUrl = uploadResult.url;
+                }
+            }
             var response = await clientPost.PostAsJsonAsync("Product", model.Product);
             if (response.IsSuccessStatusCode)
             {
@@ -137,7 +166,36 @@ namespace BookStore.MVC.Controllers
 
             var client = _httpClientFactory.CreateClient("BookStoreAPI");
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            // Nếu user chọn ảnh mới thì upload và gán lại ImageUrl
+            if (model.ImageFile != null && model.ImageFile.Length > 0 && model.ProductEdit != null)
+            {
+                using var form = new MultipartFormDataContent();
 
+                await using var stream = model.ImageFile.OpenReadStream();
+                var fileContent = new StreamContent(stream);
+                fileContent.Headers.ContentType =
+                    new MediaTypeHeaderValue(model.ImageFile.ContentType);
+
+                form.Add(fileContent, "file", model.ImageFile.FileName);
+                form.Add(new StringContent("books"), "folder");
+
+                var uploadResponse = await client.PostAsync("Storage/upload", form);
+                if (!uploadResponse.IsSuccessStatusCode)
+                {
+                    ModelState.AddModelError(string.Empty, "Upload ảnh thất bại.");
+                    model.Categories = await client.GetFromJsonAsync<List<CategoryDTO>>("Category");
+                    return View(model);
+                }
+
+                var uploadResult =
+                    await uploadResponse.Content.ReadFromJsonAsync<UploadResult>();
+
+                if (uploadResult != null)
+                {
+                    model.ProductEdit.ImageUrl = uploadResult.url;
+                }
+            }
+            //update logic
             var json = JsonConvert.SerializeObject(model.ProductEdit);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -155,5 +213,10 @@ namespace BookStore.MVC.Controllers
             return View(model);
         }
 
+    }
+    internal sealed class UploadResult
+    {
+        public string path { get; set; } = string.Empty;
+        public string url { get; set; } = string.Empty;
     }
 }

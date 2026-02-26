@@ -126,7 +126,8 @@
             {
                 <div class="col">
                     <div class="book-card position-relative">
-                        <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
+                    <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : book.ImageUrl)"
+                         class="card-img-top" alt="@book.Title" />
                         <div class="card-body">
                             <h5 class="book-title">@book.Title</h5>
                             <p class="card-text">Tác giả: @book.Author</p>
@@ -157,8 +158,10 @@
                 {
                     <div class="col">
                         <div class="book-card position-relative">
-                            <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" />
-                            <div class="card-body">
+                            @* <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : "~/images/" + book.ImageUrl)" class="card-img-top" alt="@book.Title" /> *@
+                            <img src="@Url.Content(string.IsNullOrEmpty(book.ImageUrl) ? "~/images/noimage.png" : book.ImageUrl)"
+                                 class="card-img-top" alt="@book.Title" /> 
+                                <div class="card-body">
                                 <h5 class="book-title">@book.Title</h5>
                                 <p class="card-text">Tác giả: @book.Author</p>
                                 <p class="text-success fw-bold">@book.Price.ToString("n0")₫</p>
