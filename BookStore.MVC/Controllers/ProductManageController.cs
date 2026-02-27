@@ -73,11 +73,12 @@ namespace BookStore.MVC.Controllers
 
                 form.Add(fileContent, "file", model.ImageFile.FileName);
 
-
                 var uploadResponse = await clientPost.PostAsync("storage/upload", form);
+
                 if (!uploadResponse.IsSuccessStatusCode)
                 {
-                    ModelState.AddModelError(string.Empty, "Upload ảnh thất bại.");
+                    var error = await uploadResponse.Content.ReadAsStringAsync(); // thêm dòng này
+                    ModelState.AddModelError(string.Empty, $"Upload ảnh thất bại ({(int)uploadResponse.StatusCode}): {error}");
                     model.Categories = await clientPost.GetFromJsonAsync<List<CategoryDTO>>("Category");
                     return View(model);
                 }
@@ -178,11 +179,12 @@ namespace BookStore.MVC.Controllers
 
                 form.Add(fileContent, "file", model.ImageFile.FileName);
 
+            var uploadResponse = await client.PostAsync("storage/upload", form);
 
-                var uploadResponse = await client.PostAsync("storage/upload", form);
                 if (!uploadResponse.IsSuccessStatusCode)
                 {
-                    ModelState.AddModelError(string.Empty, "Upload ảnh thất bại.");
+                    var error = await uploadResponse.Content.ReadAsStringAsync(); // thêm dòng này
+                    ModelState.AddModelError(string.Empty, $"Upload ảnh thất bại ({(int)uploadResponse.StatusCode}): {error}");
                     model.Categories = await client.GetFromJsonAsync<List<CategoryDTO>>("Category");
                     return View(model);
                 }

@@ -27,36 +27,45 @@ namespace BookStore.API.Controllers
         [HttpPost("upload")]
         public async Task<IActionResult> Upload([FromForm] UploadRequest request)
         {
-            var file = request.file;
-
-            if (file == null || file.Length == 0)
+            try
             {
-                return BadRequest("File is required.");
+                var file = request.file;
+
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("File is required.");
+                }
+                if (file.Length > 5 * 1024 * 1024)
+                {
+                    return BadRequest("File must small than 5 MB.");
+                }
+
+                var uniqueName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                var path = uniqueName;
+
+                byte[] bytes;
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(memoryStream);
+                    bytes = memoryStream.ToArray();
+                }
+
+                // điểm dễ lỗi nhất: Supabase client / bucket
+                await _supabaseClient.Storage
+                    .From(_settings.Bucket)
+                    .Upload(bytes, path);
+
+                var publicUrl = _supabaseClient.Storage
+                    .From(_settings.Bucket)
+                    .GetPublicUrl(path);
+
+                return Ok(new { path, url = publicUrl });
             }
-            if (file.Length > 5 * 1024 * 1024)
+            catch (Exception ex)
             {
-                return BadRequest("File must small than 5 MB.");
+                // tạm thời log đơn giản
+                return StatusCode(500, $"Storage upload error: {ex.Message}");
             }
-
-            var uniqueName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-            var path = uniqueName; // không dùng folder nữa
-
-            byte[] bytes;
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                bytes = memoryStream.ToArray();
-            }
-
-            await _supabaseClient.Storage
-                .From(_settings.Bucket)
-                .Upload(bytes, path);
-
-            var publicUrl = _supabaseClient.Storage
-                .From(_settings.Bucket)
-                .GetPublicUrl(path);
-
-            return Ok(new { path, url = publicUrl });
         }
 
         /// <summary>

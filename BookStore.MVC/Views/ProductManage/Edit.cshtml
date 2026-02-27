@@ -6,7 +6,7 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="ProductEdit.ProductId" />
 
     <div class="mb-3">
