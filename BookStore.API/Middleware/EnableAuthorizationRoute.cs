@@ -15,6 +15,8 @@ namespace BookStore.API.Middleware
             "/api/Category",
             "/swagger",             // Cho phép vào trang tài liệu API
             "/favicon.ico",
+            "/api/storage/upload",
+            "/api/storage/delete",
             "/api/User/verify-email"
 
         };

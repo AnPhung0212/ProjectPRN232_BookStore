@@ -28,7 +28,6 @@ namespace BookStore.API.Controllers
         public async Task<IActionResult> Upload([FromForm] UploadRequest request)
         {
             var file = request.file;
-            var folder = request.folder;
 
             if (file == null || file.Length == 0)
             {
@@ -39,16 +38,9 @@ namespace BookStore.API.Controllers
                 return BadRequest("File must small than 5 MB.");
             }
 
-            if (string.IsNullOrWhiteSpace(folder))
-            {
-                folder = "others";
-            }
-
-            var extension = Path.GetExtension(file.FileName);
             var uniqueName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-            var path = $"{folder.TrimEnd('/')}/{uniqueName}";
+            var path = uniqueName; // không dùng folder nữa
 
-            // Đọc stream thành byte[]
             byte[] bytes;
             using (var memoryStream = new MemoryStream())
             {
@@ -64,11 +56,7 @@ namespace BookStore.API.Controllers
                 .From(_settings.Bucket)
                 .GetPublicUrl(path);
 
-            return Ok(new
-            {
-                path,
-                url = publicUrl
-            });
+            return Ok(new { path, url = publicUrl });
         }
 
         /// <summary>
@@ -82,14 +70,25 @@ namespace BookStore.API.Controllers
                 return BadRequest("filePath is required.");
             }
 
-            // Nếu là full URL thì cắt thành relative path
+            // Chuẩn hóa baseUrl, bỏ gạch chéo cuối
             var bucketBaseUrl = _supabaseClient.Storage
                 .From(_settings.Bucket)
-                .GetPublicUrl(string.Empty);
+                .GetPublicUrl(string.Empty).TrimEnd('/');
 
-            var relativePath = filePath.StartsWith(bucketBaseUrl, StringComparison.OrdinalIgnoreCase)
-                ? filePath.Substring(bucketBaseUrl.Length).TrimStart('/')
-                : filePath;
+            string relativePath;
+
+            if (filePath.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            {
+                // Nếu là full URL
+                relativePath = filePath.StartsWith(bucketBaseUrl, StringComparison.OrdinalIgnoreCase)
+                    ? filePath.Substring(bucketBaseUrl.Length).TrimStart('/')
+                    : throw new ArgumentException("filePath is not a valid URL for this bucket.");
+            }
+            else
+            {
+                // Đã là relative path
+                relativePath = filePath.TrimStart('/');
+            }
 
             await _supabaseClient.Storage
                 .From(_settings.Bucket)
@@ -101,7 +100,6 @@ namespace BookStore.API.Controllers
         public class UploadRequest
         {
             public IFormFile file { get; set; } = null!;
-            public string folder { get; set; } = "others";
         }
     }
 }
